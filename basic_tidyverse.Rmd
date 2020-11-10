@@ -318,6 +318,19 @@ ggplot(data = ChickWeight) +
   facet_wrap(~Diet)
 ```
 
+### Question 10
+
+Correct the code:
+```{r ggplot_q10, exercise = TRUE}
+gplot(data = ToothGrowth)
+  geompoint(aes = (x = does, y = len), colour = supp)
+```
+
+```{r ggplot_q10-solution}
+ggplot(data = ToothGrowth) + #spelling mistake, "+" missing
+  geom_point(mapping = aes(x = dose, y = len, colour = supp)) # spelling mistakes, remove "=" after aes, colour argument is outside of aes
+```
+
 ## Coding Basics
 
 R can be used as a calculator
@@ -1152,9 +1165,12 @@ penguins %>%
 ### Question 9
 
 Suggest an alternative method to achieve the same output as:
+```{r transform_q9_question}
 penguins %>% 
   group_by(species, island) %>% 
   summarise(bill_length_mm = mean(bill_length_mm, na.rm = T))
+```
+
 ```{r transform_q9, exercise = TRUE}
 
 ```
