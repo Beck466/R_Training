@@ -12,7 +12,9 @@ library(tidyverse)
 library(palmerpenguins)
 ```
 
-## ggplot
+## Visualisation
+
+In R the ggplot2 package is used to create plots
 
 ggplot(data = <dataframe>)
 -Creates an empty plot
@@ -1254,3 +1256,5 @@ mpg %>%
   ggplot()+
   geom_col(aes(x = model, y = avg_displ, fill = class))
 ```
+
+
