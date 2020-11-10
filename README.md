@@ -1,6 +1,11 @@
 # R_Training
 Training material for tidyverse
 
+## Content Purpose
+This training was developed to reinforce the learning of R, in conjunction with online modules where the content is discussed with the trainees.
+<br>The notes from the online modules are captured in a learnr script, which allows the trainees to have a copy of the notes from module, as well as a copy of all the exercises, and additional exercises for them to test their knowledge.
+<br>This also allows for them to revisit the learning after the course has finished, as some trainees may be infrequent users of R.
+
 ## Learner Profiles:
 ### John the Process Tech
 1.	General background
