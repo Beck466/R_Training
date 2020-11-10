@@ -44,3 +44,23 @@ This training was developed to reinforce the learning of R, in conjunction with 
 4.	Special Considerations
     <br>-Not feasible to travel (training needs to be online)
     <br>-May not understand specific manufacturing examples
+
+## Topics Covered:
+1.  Visualisation
+  <br>-Create a ggplot
+  <br>-Aesthetic properties
+  <br>-geom_point
+  <br>-geom_line
+  <br>-geom_boxplot
+  <br>-geom_bar
+  <br>-facet_wrap
+  <br>-facet_grid
+2.  Coding Basics
+3.  Data Transformation
+  <br>-Filter
+  <br>-Arrange
+  <br>-Select
+  <br>-Mutate
+  <br>-Pipes
+  <br>-Grouping
+  <br>-Summarising
