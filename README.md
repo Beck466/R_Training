@@ -6,7 +6,12 @@ This training was developed to reinforce the learning of R, in conjunction with 
 <br>The notes from the online modules are captured in a learnr script, which allows the trainees to have a copy of the notes from module, as well as a copy of all the exercises, and additional exercises for them to test their knowledge.
 <br>This also allows for them to revisit the learning after the course has finished, as some trainees may be infrequent users of R.
 
-## Learner Profiles:
+# Required Packages
+learnr
+<br>tidyverse
+<br>palmerpenguins
+
+## Learner Profiles
 ### John the Process Tech
 1.	General background
     <br>-Process Technologist with a degree in Engineering
@@ -45,7 +50,7 @@ This training was developed to reinforce the learning of R, in conjunction with 
     <br>-Not feasible to travel (training needs to be online)
     <br>-May not understand specific manufacturing examples
 
-## Topics Covered:
+## Topics Covered
 1.  Visualisation
   <br>-Create a ggplot
   <br>-Aesthetic properties
