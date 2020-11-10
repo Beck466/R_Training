@@ -1,0 +1,1240 @@
+---
+title: "R Training"
+output: learnr::tutorial
+runtime: shiny_prerendered
+description: Code format of the R Training
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(learnr)
+library(tidyverse)
+library(palmerpenguins)
+```
+
+## ggplot
+
+ggplot(data = <dataframe>)
+-Creates an empty plot
+-Need to add a “geom” to plot something
+
+ggplot template:
+ggplot(data = <DATA>) +
+   <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))
+
+Replace the bracketed sections in the code to create the plot
+Mapping defines how variables in the dataset are mapped to visual properties
+
+### Create a plot
+Using the "penguins" dataset, plot "bill_length_mm" vs "bill_depth_mm"
+```{r ggplot_1, warning=FALSE}
+ggplot(data = penguins) +
+  geom_point(mapping = aes(x = bill_length_mm, y = bill_depth_mm))
+```
+
+Exercise: 
+For the "mpg" dataset, plot "displ" by "hwy"
+```{r ggplot_2, exercise=TRUE}
+ggplot(data = ) +
+  geom_point(mapping = aes(x = , y = ))
+```
+
+```{r ggplot_2-solution}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy))
+```
+
+Exercise:
+For the "storms" dataset, plot "wind" vs "pressure"
+```{r ggplot_3, exercise=TRUE}
+
+```
+
+```{r ggplot_3-solution}
+ggplot(data = storms) +
+  geom_point(mapping = aes(x = wind, y = pressure))
+```
+
+# ggplot - aesthetics
+
+Mappings can be used to add more information to the plots
+
+### Add colour to the penguins plot
+Using the "penguin" plot above, colour by "species"
+```{r ggplot_colour, warning=FALSE}
+ggplot(data = penguins) +
+  geom_point(mapping = aes(x = bill_length_mm, y = bill_depth_mm, colour = species))
+```
+
+### Use size, shape, and alpha
+Change the above to use different sizes for different "species"
+```{r ggplot_size, warning=FALSE}
+ggplot(data = penguins) +
+  geom_point(mapping = aes(x = bill_length_mm, y = bill_depth_mm, size = species))
+```
+
+Change the above to use different shapes for different "species"
+```{r ggplot_shape, warning=FALSE}
+ggplot(data = penguins) +
+  geom_point(mapping = aes(x = bill_length_mm, y = bill_depth_mm, shape = species))
+```
+
+Change the above to use different transparency for different "species"
+```{r ggplot_alpha, warning=FALSE}
+ggplot(data = penguins) +
+  geom_point(mapping = aes(x = bill_length_mm, y = bill_depth_mm, alpha = species))
+```
+
+### Manually set the colour and transparency
+Can manually set colour etc. by taking the arguments outside of mapping
+
+For the "penguins" plot above, colour all the points blue with a transparency of 0.8
+```{r ggplot_manual_colour, warning=FALSE}
+ggplot(data = penguins) +
+  geom_point(mapping = aes(x = bill_length_mm, y = bill_depth_mm), colour = "blue", alpha = 0.8)
+```
+
+Exercise:
+For the "mpg" plot above, add "class" as a colour
+```{r ggplot_aes_1, exercise=TRUE}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, colour = ))
+```
+
+```{r ggplot_aes_1-solution}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, colour = class))
+```
+
+Exercise:
+For the "storms" plot above, add "status" as a colour and change shape to be a square
+```{r ggplot_aes_2, exercise=TRUE}
+ggplot(data = storms) +
+  geom_point(mapping = aes(x = wind, y = pressure))
+```
+
+```{r ggplot_aes_2-solution}
+ggplot(data = storms) +
+  geom_point(mapping = aes(x = wind, y = pressure, colour = status), shape = "square")
+```
+
+# ggplot - other geoms
+
+### geom_line
+Use "economics_long" to create a line chart of "value" for the different dates in "date", coloured by "variable"
+```{r geom_line, warning=FALSE}
+ggplot(data = economics_long) +
+  geom_line(mapping = aes(x = date, y = value, colour = variable))
+```
+
+### geom_boxplot
+Use "penguins" to create a box plot showing the spread of "flipper_length_mm" for each "species", coloured by "species"
+```{r geom_boxplot, warning=FALSE}
+ggplot(data = penguins) +
+  geom_boxplot(mapping = aes(x = species, y = flipper_length_mm, colour = species))
+```
+
+### geom_bar
+For the "mpg" dataset, create a bar chart for the number of entries for "class", coloured by "drv"
+```{r geom_bar, warning=FALSE}
+ggplot(data = mpg) +
+  geom_bar(mapping = aes(x = class, fill = drv))
+```
+
+Take the same plot, but position the bars next to each other
+```{r geom_bar_2, warning=FALSE}
+ggplot(data = mpg) +
+  geom_bar(mapping = aes(x = class, fill = drv), position = "dodge")
+```
+
+Exercise:
+Using "diamonds" create a boxplot of "carat" for each value of "cut"
+```{r geom_boxplot_2, exercise=TRUE}
+ggplot(data = ) +
+  geom_boxplot(mapping = aes(x = , y = ))
+```
+
+```{r geom_boxplot_2-solution}
+ggplot(data = diamonds) +
+  geom_boxplot(mapping = aes(x = carat, y = cut))
+```
+
+Exercise:
+Using "diamonds" create a bar chart of "color", coloured by "cut", with the bars next to each other
+```{r geom_bar_3, exercise=TRUE}
+
+```
+
+```{r geom_bar_3-solution}
+ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = color, fill = cut), position = "dodge")
+```
+
+geom_col is a variation of geom_bar, where both the x and y arguments are specified in the mapping argument
+
+# ggplot - facetting
+
+### facet_wrap
+From "diamonds" plot "carat" against "price" and facet by "cut"
+```{r facet_wrap, warning=FALSE}
+ggplot(data = diamonds) +
+  geom_point(mapping = aes(x = carat, y = price))+
+  facet_wrap(~cut)
+```
+
+### facet_grid
+For "penguins" plot the "bill_length_mm" against "bill_depth_mm" and facet by island and species
+```{r facet_grid, warning=FALSE}
+ggplot(data = penguins) +
+  geom_point(mapping = aes(x = bill_length_mm, y = bill_depth_mm))+
+  facet_grid(island~species)
+```
+
+Exercise:
+Using "mpg" create a plot of "displ" vs "hwy" and facet by "class"
+```{r facet_wrap_2, exercise=TRUE}
+ggplot(data = ) +
+  geom_point(mapping = aes(x = , y = )) +
+  facet_wrap(~)
+```
+
+```{r facet_wrap_2-solution}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = disp, y = hwy)) +
+  facet_wrap(~class)
+```
+
+Exercise:
+Using "mtcars" create a plot of "mpg" vs "wt" and facet by the "am" and "gear" variables
+```{r facet_grid_2, exercise=TRUE}
+
+```
+
+```{r facet_grid_2-solution}
+ggplot(data = mtcars) +
+  geom_point(mapping = aes(x=mpg, y = wt)) +
+  facet_grid(am~gear)
+```
+
+# Test your knowledge
+
+### Question 1
+```{r ggplot_q1, echo=FALSE}
+question("What is the output from running the code ggplot()?",
+  answer("A scatterplot of x vs y", message = "To add data to the plot need to add a geom (geom_point for a scatterplot)"),
+  answer("No output", message = "ggplot() is a valid function - creates an empty plot with no data until a geom is added"),
+  answer("An empty plot", correct = TRUE),
+  answer("An error", message = "ggplot() is a valid function - creates an empty plot with no data until a geom is added"))
+```
+
+### Question 2
+```{r ggplot_q2, echo=FALSE}
+question("Which of these geoms will colour the points by class?",
+  answer("geom_point(mapping = aes(x = displ, y = hwy, colour = class))", correct = TRUE),
+  answer("point(mapping = aes(x = displ, y = hwy, colour = class))", message = "check the function - shouldn;t this be geom_point?"),
+  answer("geom_point(mapping = aes(x = displ, y = hwy), colour = class)", message = "check the position of the colour argument - if it's not inside the aesthetics function it will not be able to use parameters from the dataset"),
+  answer("geom_point(mapping = aes(x = displ, y = hwy, fill = class))", message = "geom_point uses colour or color, rather than fill"))
+```
+
+### Question 3
+```{r ggplot_q3, echo=FALSE}
+question("Will this code change the shape based on species: geom_point(mapping = aes(x = bill_length_mm, y = bill_depth_mm, shape = 'species'))?",
+  answer("Yes", message = "'species' in quotations will be read as a character, rather than identified as a parameter, which will result in one shape being used for the plot, labelled 'species' in the legend"),
+  answer("No", correct = TRUE, message = "'species' in quotations will be read as a character, rather than identified as a parameter"))
+```
+
+### Question 4
+```{r ggplot_q4, echo=FALSE}
+question("Which of these is correct:",
+  answer("geom_bar(mapping = aes(x = species, colour = island)", message = "geom_bar uses 'fill' instead of 'colour'"),
+  answer("geom_bar(mapping = aes(x = species, y = average_bill_length, fill = island))", message = "geom_bar does not have  a 'y' argument, use geom_col instead"),
+  answer("geom_bar(mapping = aes(x = species, fill = island)", correct = TRUE),
+  answer("geom_col(mapping = aes(x = species, y = average_bill_length, fill = island))", correct = TRUE),
+  answer("geom_col(mapping = aes(x = species, fill = island)", message = "geom_col requires a 'y' argument, use geom_bar instead"))
+```
+
+### Question 5
+
+Using the "penguins" dataset create a bar chart of "sex", coloured by "species" and facetted by "island", with bars next to each other
+```{r ggplot_q5, exercise = TRUE, warning = FALSE}
+
+```
+
+```{r ggplot_q5-solution}
+ggplot(data = penguins) +
+  geom_bar(mapping = aes(x = sex, fill = species), position = "dodge")+
+  facet_wrap(~island)
+```
+
+### Question 6
+
+For the "DNase" dataset, plot "conc" vs "density" using a scatterplot, change the colour to blue and the shape to a triangle, and facet by "Run"
+```{r ggplot_q6, exercise = TRUE}
+ggplot(data = DNase)+
+  geom_point(mapping = aes(x = conc, y = density), colour = "blue", shape = "triangle")+
+  facet_wrap(~Run)
+```
+
+```{r ggplot_q6-solution}
+ggplot(data = DNase)+
+  geom_point(mapping = aes(x = conc, y = density), colour = "blue", shape = "triangle")+
+  facet_wrap(~Run)
+```
+
+### Question 7
+
+Using the "BOD" dataset, plot "demand" for each value of "Time" on a bar chart and colour all bars lightpink
+```{r ggplot_q7, exercise = TRUE}
+
+```
+
+```{r ggplot_q7-solution}
+ggplot(data = BOD)+
+  geom_col(mapping = aes(x = Time, y = demand), fill =  "lightpink")
+```
+
+### Question 8
+
+Using the "InsectSprays", use a box plot to plot "count" for each "spray", and colour by "spray"
+```{r ggplot_q8, exercise = TRUE}
+
+```
+
+```{r ggplot_q8-solution}
+ggplot(data = InsectSprays) +
+  geom_boxplot(aes(x = spray, y = count, colour = spray))
+```
+
+### Question 9
+
+Using the "ChickWeight" dataset, plot "Time" vs "weight" using a line plot, colour by "Chick", and facet by "Diet"
+```{r ggplot_q9, exercise = TRUE}
+
+```
+
+```{r ggplot_q9-solution}
+ggplot(data = ChickWeight) +
+  geom_line(mapping = aes(x = Time, y = weight, colour = Chick))+
+  facet_wrap(~Diet)
+```
+
+## Coding Basics
+
+R can be used as a calculator
+```{r calculator}
+5 * 6
+```
+
+Values or objects can be stored by assigning them to a name.  Run the object name to call the output of the object
+```{r storing_objects}
+variable <- 5
+object <- 2 * 5
+
+variable
+object
+```
+
+-Names can include capital letters, numbers, underscores, and full stops.  Do not use special characters or spaces.
+-Snake case is recommended: i_am_snake_case (all lower case with underscores separating words)
+-Make object names descriptive
+
+Functions come in the form of function_name(arg1 = val1, arg2 = val2, ...)
+In R, brackets always come in pairs, as well as quotation marks
+See next section to practice using functions
+
+
+## Data Transformation
+
+### Filter
+
+Filter allows you to subset observations based on their values
+The first argument is the name of the data frame, the second and subsequent arguments are the expressions that filter the data frame
+
+
+Filter "storms" for "name" is equal to "Amy"
+```{r filter, warning = FALSE}
+filter(storms, name == "Amy")
+```
+Note the use of “==“ which is used to test for equality
+
+To save the result for use later on, you need to assign the code to a variable name:
+
+Assign the filtered dataset to a variable, then call the variable
+```{r filter_name, warning = FALSE}
+filtered_dataset <- filter(storms, name == "Amy")
+filtered_dataset
+```
+
+The function is able to filter for multiple conditions:
+
+Filter "storms" for "name" is equal to "Amy" and "status" is equal to "tropical depression"
+```{r filter_multiple, warning = FALSE}
+filter(storms, name == "Amy", status == "tropical depression")
+```
+
+Exercise:
+Filter "penguins" for "species" is equal to "Adelie" and "sex" is equal to "female".  Save to a variable called "female_adelies" and call the variable to see the output
+```{r filter_2, exercise = TRUE}
+ <- filter(penguins, species == , sex == )
+female_adelies
+```
+
+```{r filter_2-solution, warning = FALSE}
+female_adelies <- filter(penguins, species == "Adelie", sex == "female")
+female_adelies
+```
+
+Exercise:
+Filter "diamonds" for "cut" is equal to "Premium" and "color" is equal to "I".  Save to a variable called "premium_diamonds" and call the variable to see the output
+```{r filter_3, exercise = TRUE}
+
+```
+
+```{r filter_3-solution, warning = FALSE}
+premium_diamonds <- filter(diamonds, cut == "Premium", color == "I")
+premium_diamonds
+```
+
+### Filter - Logical Operators
+
+Multiple arguments can be combined used “and”, “or”, and “not”
+“and” = “&”, “or” = “|”, “not” = “!’
+
+Filtering "storms" for "name" is "Amy" AND "wind" is 30:
+```{r filter_and, warning = FALSE}
+filter(storms, name == "Amy" & wind == 30)
+```
+
+Filtering "storms" for "name" is "Amy" OR "name" is "Caroline":
+```{r filter_or, warning = FALSE}
+filter(storms, name == "Amy" | name == "Caroline")
+```
+
+This could also be written using the %in% operator:
+```{r filter_in, warning = FALSE}
+filter(storms, name %in% c("Amy", "Caroline"))
+```
+
+Filter "storms" for "name" is not "Amy" or "Caroline"
+```{r filter_or_2, warning = FALSE}
+filter(storms, name != "Amy" | name != "Caroline")
+```
+
+This could also be written using the %in% operator:
+```{r filter_in_2, warning = FALSE}
+filter(storms, !name %in% c("Amy", "Caroline"))
+```
+
+Can use comparison operators as well
+
+Filter "storms" for "wind" greater than or equal to 30
+```{r filter_greater, warning = FALSE}
+filter(storms, wind >= 30)
+```
+
+Can filter for comparison between columns in the dataset
+
+Filter "storms" for "wind" less than "pressure"
+```{r filter_compare, warning = FALSE}
+filter(storms, wind < pressure)
+```
+
+To filter for NA's, use is.na()
+
+In the "starwars dataset, filter for "hair_color" is NA
+```{r filter_na, warning = FALSE}
+filter(starwars, is.na(hair_color))
+```
+
+Exercise:
+Filter "diamonds" for "color" equal to "E" or "H" and "x" less than or equal to "y" and "x" greater than "z"
+```{r filter_4, exercise = TRUE}
+filter(diamonds,  %in%  &  <=  &  > )
+```
+
+```{r filter_4-solution}
+filter(diamonds, color %in% c("E", "H") & x <= y & x > z)
+```
+
+Exercise:
+Filter "penguins" for "body_mass_g" less than 3500 or "body_mass_g" greater than 4000
+```{r filter_5, exercise = TRUE}
+
+```
+
+```{r filter_5-solution}
+filter(penguins, body_mass_g < 3500 | body_mass_g > 4000)
+```
+
+Exercise:
+Filter "penguins" for "body_mass_g" less than 3500 or "body_mass_g" greater than 4000 and "island" does not equal "Torgersen" and save the result to an object called "filtered_penguins".  Call the object to see the output.
+```{r filter_6, exercise = TRUE}
+
+```
+
+```{r filter_6-solution}
+filtered_penguins <- filter(penguins, (body_mass_g < 3500 | body_mass_g > 4000) & island != "Torgersen")
+filtered_penguins
+```
+
+### Arrange
+
+Arrange acts similarly to filter, except it orders the rows
+It takes a dataframe, and a set of column names to order by
+If more than one column name is provided, it orders by the first column, then by the second, etc.
+
+Arrange storms by month, then day, then hour
+```{r arrange, warning = FALSE}
+arrange(storms, month, day, hour)
+```
+
+Arrange storms by descending month, descending day, then descending hour
+```{r arrange_desc, warning = FALSE}
+arrange(storms, desc(month, day, hour))
+```
+
+Arrange storms by descending month, descending day, then descending hour using "-"
+```{r arrange_desc_2, warning = FALSE}
+arrange(storms, -month, -day, -hour)
+```
+
+Exercise:
+Arrange "diamonds" by "cut", "color", then descending "carat"
+```{r arrange_1, exercise=TRUE}
+arrange(diamonds, , , desc())
+```
+
+```{r arrange_1-solution}
+arrange(diamonds, cut, color, desc(carat))
+```
+
+Exercise:
+Arrange "penguins" by "year", "sex", then descending "body_mass_g"
+```{r arrange_2, exercise=TRUE}
+
+```
+
+```{r arrange_2-solution}
+arrange(penguins, year, sex, -body_mass_g)
+```
+
+### Select
+
+Allows narrowing in on the variables of interest
+Retains or drops the specified columns
+Can be used to rearrange the order of the columns
+
+Keeping only the specified columns:
+
+For "storms" select the "name", "year", "status", and "pressure" columns
+```{r select, warning = FALSE}
+select(storms, name, year, status, pressure)
+```
+
+Keeping columns except those specified:
+
+For "storms" drop the "month", "day", "hour", and "lat", and "long" columns
+```{r select_2, warning = FALSE}
+select(storms, -month, -day, -hour, -lat, -long)
+```
+
+Rearranging the order of the columns:
+
+For "storms" put the "status" column after the "name" column
+```{r select_3, warning = FALSE}
+select(storms, name, status, everything())
+```
+
+Exercise:
+For "diamonds" select the "cut", "color", and "carat" columns
+```{r select_4, exercise = TRUE}
+select(diamonds, , , )
+```
+
+```{r select_4-solution}
+select(diamonds, cut, color, carat)
+```
+
+Exercise:
+For "penguins", remove the "sex" and "year" columns
+```{r select_5-solution}
+
+```
+
+```{r select_5, exercise=TRUE}
+select(penguins, -sex, -year)
+```
+
+There are helper functions that can be used with select
+
+starts_with():
+
+For "diamonds, select all columns that start with "c"
+```{r select_starts, warning = FALSE}
+select(diamonds, starts_with("c"))
+```
+
+ends_with():
+
+For "penguins" select the species column and any column ending with "mm"
+```{r select_ends, warning = FALSE}
+select(penguins, species, ends_with("mm"))
+```
+
+contains():
+
+For penguins, select all columns that contains "length"
+```{r select_contains, warning = FALSE}
+select(penguins, contains("length"))
+```
+
+Can also select a range of columns:
+
+For "storms" select all columns from "name" to "hour"
+```{r select_range, warning = FALSE}
+select(storms, name:hour)
+```
+
+Distinct can be used to select columns and return unique values in those columns:
+
+For "storms", select the unique options in the name and status columns
+```{r distinct, warning = FALSE}
+distinct(storms, name, status)
+```
+
+Exercise:
+For penguins select species, any columns that end with mm, and all columns from sex to year
+```{r select_6, exercise = TRUE}
+select(penguins, , , )
+```
+
+```{r select_6-solution}
+select(penguins, species, ends_with("mm"), sex:year)
+```
+
+Exercise:
+For "penguins", select the "species" column and any columns that contain "length" or "depth"
+```{r select_contains_2, exercise = TRUE}
+
+```
+
+```{r select_contains_2-solution}
+select(penguins, contains("length") | contains ("depth"))
+```
+
+Exercise:
+For "penguins", remove any columns that end with "mm"
+```{r select_ends_2, exercise = TRUE}
+
+```
+
+```{r select_ends_2-solution}
+select(penguins, -ends_with("mm"))
+```
+
+### Mutate
+
+Mutate adds a new column, often as a function of another column
+The new column is added at the end of the dataset
+
+For "storms" create a new column called "modified_pressure" which divides "pressure" by 1000
+```{r mutate, warning = FALSE}
+mutate(storms, modified_pressure = pressure / 1000)
+```
+
+It can also be used to manipulate and existing column:
+
+For "storms" modify the column called "pressure" to divide "pressure" by 1000
+```{r mutate_2, warning = FALSE}
+mutate(storms, pressure = pressure / 1000)
+```
+
+You can create multiple columns in the same mutate function, and also refer to newly created columns:
+
+For "diamonds" create a new column called "volume" which multiples "x", "y", and "z", then use this column to create a new column called "cubic_volume"
+```{r mutate_3, warning = FALSE}
+mutate(diamonds, 
+       volume = x * y * z,
+       cubic_volume = volume / 1000)
+```
+
+If you only want to keep the new columns, use transmute():
+
+For "diamonds" create a new column called "price_per_carat" from dividing "price" by "carat" and create a new column called "volume" which multiples "x", "y", and "z".  Return the new columns only.
+```{r transmute, warning = FALSE}
+transmute(diamonds,
+          price_per_carat = price / carat,
+          volume = x * y * z)
+```
+
+Exercise:
+For "penguins", create a new column called "bill_area_mm" by multiplying "bill_length_mm" and "bill_depth_mm", then create another column called bill_area_cm by dividing the new column by 100
+```{r mutate_4, exercise = TRUE}
+mutate(penguins,
+        =  * ,
+        =  / 100)
+```
+
+```{r mutate_4-solution}
+mutate(penguins,
+       bill_area_mm = bill_length_mm * bill_depth_mm,
+       bill_area_cm = bill_area_mm / 100)
+```
+
+Exercise:
+For "starwars" modify the "height" column to be "height" / 100 and modify the "mass" column to be "mass" * 2.2
+```{r mutate_5, exercise = TRUE}
+
+```
+
+```{r mutate_5-solution}
+mutate(starwars,
+       height = height / 100,
+       mass = mass * 2.2)
+```
+
+### Pipes
+
+Pipes allow multiple operations to be combined or stringed together
+Makes code more readable
+Focuses on the transformations, rather than what is being transformed
+Removes the need for intermediate steps
+Takes the resulting dataframe and uses this as the first argument to the next function
+
+With piping:
+```{r pipes, warning = FALSE}
+new_penguins_dataset <- penguins %>% 
+  select(species, ends_with("mm")) %>% 
+  filter(!is.na(bill_length_mm)) %>% 
+  mutate(bill_area_mm = bill_length_mm * bill_depth_mm) %>% 
+  distinct(species, bill_area_mm)
+new_penguins_dataset
+```
+
+Without piping:
+```{r pipes_2, warning = FALSE}
+
+selected_penguins <- select(penguins, species, ends_with("mm"))
+filtered_penguins <- filter(selected_penguins, !is.na(bill_length_mm))
+penguins_with_area <- mutate(filtered_penguins, bill_area_mm = bill_length_mm * bill_depth_mm)
+new_penguins_dataset <- distinct(penguins_with_area, species, bill_area_mm)
+
+new_penguins_dataset
+```
+
+Exercise:
+Filter "diamonds" for "cut" is either "Premium" or "Good", select the "cut", "color", "price" and "carat" columns, create a new column called "price_per_carat" whcih divides "price" by "carat", then filter for the new column with values over 1500
+```{r pipes_3, exercise = TRUE}
+diamonds %>% 
+  filter(cut %in% ) %>% 
+  select( , , , ) %>% 
+  mutate(price_per_carat =  / ) %>% 
+  filter( > 1500)
+```
+
+```{r pipes_3-solution}
+diamonds %>% 
+  filter(cut %in% c("Premium", "Good")) %>% 
+  select(cut, color, price, carat) %>% 
+  mutate(price_per_carat = price / carat) %>% 
+  filter(price_per_carat > 1500)
+```
+
+Exercise:
+Filter "storms for "ts_diameter" is not NA, select all columns except "year", "month", "day", "hour", "lat", and "long", change the "pressure" column to be divided by 1000, change the "ts_diameter" amd "hu_diameter" columns to be divided by 10, and then filter for "status" is equal to "tropical storm".
+```{r pipes_4, exercise = TRUE}
+
+```
+
+```{r pipes_4-solution}
+storms %>% 
+  filter(!is.na(ts_diameter)) %>% 
+  select(-year, -month, -day, -hour, -lat, -long) %>% 
+  mutate(pressure = pressure / 1000,
+         ts_diameter = ts_diameter / 10,
+         hu_diameter = hu_diameter / 10) %>% 
+  filter(status == "tropical storm")
+```
+
+### Group and Summarise
+
+We can use a function called group_by() to specific groups within the dataframe.  This then allows calculations to be performed by group, rather than by row or over the entire dataframe.
+
+To demonstrate the use of group_by, we can also combine with the summarise() function to calculate summaries for each group.
+
+Summarise will collapse the dataframe down to a single row per group, and will only retain the group columns and the summarised columns.
+
+For "storms", group by "name" and "status", then create a summarised table with new columns "avg_wind" and "avg_pressure"
+```{r group, warning = FALSE}
+storms %>% 
+  group_by(name, status) %>% 
+  summarise(avg_wind = mean(wind, na.rm = T),
+            avg_pressure = mean(pressure, na.rm = T))
+```
+Note: na.rm is to account for missing values (NA's).  By setting this to TRUE the summary will ignore the NA's.  If set to false (the defualt) where one NA is present the summary value will be NA.
+
+If mutate() is used instead of summarise(), all columns and rows are retained:
+
+For "storms", create two new columns ("avg_wind" and "avg_pressure") which have the average wind and pressure for each "name" and "status" group
+```{r group_2, warning = FALSE}
+storms %>% 
+  group_by(name, status) %>% 
+  mutate(avg_wind = mean(wind, na.rm = T),
+            avg_pressure = mean(pressure, na.rm = T))
+```
+
+Exercise:
+For "diamonds", group by "cut" and "color" and find the average "price" and "carat" for each group
+```{r group_3, exercise = TRUE}
+diamonds %>% 
+  group_by(, ) %>% 
+  summarise(avg_price = ,
+            avg_carat = )
+```
+
+```{r group_3-solution}
+diamonds %>% 
+  group_by(cut, color) %>% 
+  summarise(avg_price = mean(price, na.rm = T),
+            avg_carat = mean(carat, na.rm = T))
+```
+
+Exercise:
+For "penguins" calculate the average bill length (from "bill_length_mm"), average bill depth (from "bill_depth_mm"), and average flipper length (from "flipper_length_mm") for each combination of species and island
+```{r group_4, exercise = TRUE}
+
+```
+
+```{r group_4-solution}
+penguins %>% 
+  group_by(species, island) %>% 
+  summarise(avg_bill_length = mean(bill_length_mm, na.rm = T),
+            avg_bill_depth = mean(bill_depth_mm, na.rm = T),
+            avg_flipper_length = mean(flipper_length_mm, na.rm = T))
+```
+
+### Summarising
+
+There are other ways to create summaries.
+
+Use the summarise_all() function to find the average "wind" and "pressure" for each group of "name" and "status" for "storms"
+```{r summarise, warning = FALSE, echo = FALSE}
+storms %>% 
+  select(name, status, wind, pressure) %>% 
+  group_by(name, status) %>% 
+  summarise_all(mean, na.rm = T)
+```
+
+Use the summarise_at() function to find the average "wind" and "pressure" for each group of "name" and "status" for "storms"
+```{r summarise_2, warning = FALSE, echo = FALSE}
+storms %>% 
+  group_by(name, status) %>% 
+  summarise_at(c("wind", "pressure"),
+               mean, na.rm = T)
+```
+
+Exercise:
+For "diamonds", use summarise_all to find the average "price" and "carat" for each group of "cut" and "color" 
+```{r summarise_3, exercise = TRUE}
+diamonds %>% 
+  select(, , , ) %>% 
+  group_by(, ) %>% 
+  summarise_all()
+```
+
+```{r summarise_3-solution}
+diamonds %>% 
+  select(cut, color, price, carat) %>% 
+  group_by(cut, color) %>% 
+  summarise_all(mean, na.rm = T)
+```
+
+Exercise:
+For "penguins" calculate the average bill length (from "bill_length_mm"), average bill depth (from "bill_depth_mm"), and average flipper length (from "flipper_length_mm") for each combination of species and island using the summarise_at function
+```{r summarise_4, exercise = TRUE}
+
+```
+
+```{r summarise_4-solution}
+penguins %>% 
+  group_by(species, island) %>% 
+  summarise_at(c("bill_length_mm",
+                 "bill_depth_mm",
+                 "flipper_length_mm"),
+               mean, na.rm = T)
+```
+
+To ungroup a dataframe use ungroup()
+
+### Useful Summary Functions
+
+mean, median, min, max, sum, sd (standard deviation), IQR (interquartile range), quantile, first, nth, and last are some of the summary functions that can be used in R.
+
+For "storms", group by "name" and "status" and calculate a summary using the functions above for the "wind" column
+```{r summary, warning = FALSE, echo = FALSE}
+storms %>% 
+  group_by(name, status) %>% 
+  summarise(avg_wind = mean(wind, na.rm=T),
+            med_wind = median(wind, na.rm = T),
+            min_wind = min(wind, na.rm = T),
+            max_wind = max(wind, na.rm = T),
+            sum_wind = sum(wind, na.rm = T),
+            sd_wind = sd(wind, na.rm = T),
+            iqr_wind = IQR(wind, na.rm = T),
+            q25_wind = quantile(wind, 0.25, na.rm = T),
+            first_wind = first(wind),
+            fifth_wind = nth(wind, 5),
+            last_wind = last(wind))
+```
+
+Another useful function is n() which returns a count
+
+For "storms" find the count for each group of "name" and "species"
+```{r count, warning = FALSE, echo = FALSE}
+storms %>% 
+  group_by(name, status) %>% 
+  summarise(count = n())
+```
+
+Exercise:
+For "diamonds", for each group of "cut" and "color", find the min and max price, the 25th and 75th quantiles of carat, and a count for each group
+```{r summary_1, exercise = TRUE}
+diamonds %>% 
+  group_by(cut, color) %>% 
+  summarise(min_price = ,
+            max_price = ,
+            q25_carat = ,
+            q75_carat = ,
+            count = )
+```
+
+```{r summary_1-solution}
+diamonds %>% 
+  group_by(cut, color) %>% 
+  summarise(min_price = min(price, na.rm = T),
+            max_price = max(price, na.rm = T),
+            q25_carat = quantile(carat, 0.25, na.rm = T),
+            q75_carat = quantile(carat, 0.75, na.rm = T),
+            count = n())
+```
+
+Exercise:
+For "penguins", for each group of "species" and "island", find the mean and standard deviation for "body_mass_g, the first and last entries for "year", and a count for each group
+```{r summary_2, exercise = TRUE}
+
+```
+
+```{r summary_2-solution}
+penguins %>% 
+  group_by(species, island) %>% 
+  summarise(mean_body_mass = min(body_mass_g, na.rm = T),
+            sd_body_mass = max(body_mass_g, na.rm = T),
+            first_year = first(year),
+            last_year = last(year),
+            count = n())
+```
+
+Logical values can also be used with summary functions.
+sum(x) gives the number of TRUE’s in x and mean(x) gives the proportion
+
+For "storms", group by "name" and find the number and proportion of values in "status" which are equal to "tropical depression"
+```{r summary_3, warning = FALSE, echo = FALSE}
+storms %>% 
+  group_by(name) %>% 
+  summarise(n_status = sum(status == "tropical depression", na.rm = T),
+            tropical_depression_prop = mean(status == "tropical depression", na.rm = T))
+```
+
+Exercise:
+For "diamonds", group by "name" and find the number and proportion of "E"'s in "color"
+```{r summary_4, exercise = TRUE}
+diamonds %>% 
+  group_by() %>% 
+  summarise(e_number = ,
+            e_prop = )
+```
+
+```{r summary_4-solution}
+diamonds %>% 
+  group_by(cut) %>% 
+  summarise(e_number = sum(color == "E", na.rm = T),
+            e_prop = mean(color == "E", na.rm = T))
+```
+
+Exercise:
+For "penguins", for each group of "species" and "island" find the number and proportion of males
+```{r summary_5, exercise = TRUE}
+
+```
+
+```{r summary_5-solution}
+penguins %>% 
+  group_by(species, island) %>% 
+  summarise(number_males = sum(sex == "male", na.rm = T),
+            prop_males = mean(sex == "male", na.rm = T))
+```
+
+### Put it into a plot
+
+Datasets can be piped into a ggplot
+Remember to use “+” to add layers to the ggplot, and “%>%” to string together data transformation functions
+
+For "storms", find the average "wind" for each "status", then plot "avg_wind" per "status" on a bar chart and colour by "status"
+```{r plot_1, warning = FALSE, echo = FALSE}
+storms %>% 
+  group_by(status) %>% 
+  summarise(avg_wind = mean(wind, na.rm = T)) %>% 
+  ggplot()+
+  geom_col(aes(x = status, y = avg_wind, fill = status))
+```
+
+Exercise:
+For "diamonds", find the min, median, max, and 25% and 75% quantile of carat for each group of "cut", then use this to make a box plot
+```{r plot_2, exercise = TRUE}
+diamonds %>% 
+  group_by(cut) %>% 
+  summarise(min_carat = ,
+            q25_carat = ,
+            med_carat = ,
+            q75_carat = ,
+            max_carat = ) %>% 
+  ggplot()+
+  geom_boxplot(aes(x = , ymin = , lower = , middle = , upper = , ymax = , colour = ), stat = "identity")
+```
+
+```{r plot_2-solution}
+diamonds %>% 
+  group_by(cut) %>% 
+  summarise(min_carat = min(carat, na.rm = T),
+            q25_carat = quantile(carat, 0.25, na.rm = T),
+            med_carat = median(carat, na.rm = T),
+            q75_carat = quantile(carat, 0.75, na.rm = T),
+            max_carat = max(carat, na.rm = T)) %>% 
+  ggplot()+
+  geom_boxplot(aes(x = cut, ymin = min_carat, lower = q25_carat, middle = med_carat, upper = q75_carat, ymax = max_carat, colour = cut), stat = "identity")
+```
+
+Exercise:
+For "penguins", calculate the "bill_area" by multiplying "bill_length_mm" by "bill_depth_mm", then find the average "flipper_length_mm" and average "bill_area" for each group of "species", "island", and "year."  Plot "avg_flipper_length" by "avg_bill_area" and colour by "island."
+```{r plot_3, exercise = TRUE}
+
+```
+
+```{r plot_3-solution}
+penguins %>% 
+  mutate(bill_area = bill_length_mm * bill_depth_mm) %>% 
+  group_by(species, island, year) %>% 
+  summarise(avg_flipper_length = mean(flipper_length_mm, na.rm = T),
+            avg_bill_area = mean(bill_area, na.rm = T)) %>% 
+  ggplot()+
+  geom_point(aes(x = avg_flipper_length, y = avg_bill_area, colour = island))
+```
+
+# Test Your Knowledge
+
+### Question 1
+```{r transform_q1, echo = FALSE}
+question("Which is the best way to create an object / variable?",
+  answer("storm_status <- select(storms, name, status)", correct = TRUE),
+  answer("select(storms, name, status)", message = "To create a variable it needs to be assigned to a variable name"),
+  answer("x <- select(storms, name, status)", message = "when creating a variable it should have a descriptive name"))
+```
+
+### Question 2
+```{r transform_q2, echo = FALSE}
+question("Which of these will correctly filter the dataset?",
+  answer("filter(storms, name = 'Amy' & wind > 30)", message = "When testing for equality, need to use '==' rather than '='"),
+  answer("fliter(storms, name == 'Amy' & wind > 30)", message = "Spelling is important - Can you find the spelling mistake?"),
+  answer("filter(storms, name == 'Amy' & wind > 30)", correct = TRUE),
+  answer("filter(name == 'Amy' & wind >30)", message = "The first argument to the filter function is the dataset"))
+```
+
+### Question 3
+```{r transform_q3, echo = FALSE}
+question("What is the correct way to use a pipe?",
+  answer("storms %>% 
+         select(storms, name, status)", message = "A pipe inserts the dataframe into the first argument of the next function, so in the select function 'storms' is not needed"),
+  answer("storms %>% 
+         select(name, status)", correct = TRUE),
+  answer("storm_status <- storms %>% 
+         select(name, status)", correct = TRUE))
+```
+
+### Question 4
+```{r transform_q4, echo = FALSE}
+question("What is the correct way to create a grouped summary?",
+  answer("storms %>% 
+         group_by() %>% 
+         summarise(wind = mean(wind, na.rm = T))",
+         message = "Need to specify which columns to group by"),
+  answer("storms %>% 
+         group_by(name, status) %>% 
+         mutate(wind = mean(wind, na.rm = T))",
+         message = "mutate() will retain all columns and rows.  Use summarise() to summarise the dataframe"),
+  answer("storms %>% 
+         summarise(wind = mean(wind, na.rm = T))", 
+         message = "Need to use group_by() to specify the groups before summarising"),
+  answer("storms %>% 
+         group_by(name, status) %>% 
+         summarise(wind = mean(wind, na.rm = T))", 
+         correct = TRUE))
+```
+
+### Question 5
+
+For the "ChickWeight" dataset, filter for a "Diet" of 2, convert "weight" by dividing by 100, then make a line plot of "Time" vs "weight", coloured by "Chick"
+```{r transform_q5, exercise = TRUE}
+
+```
+
+```{r transform_q5-solution}
+ChickWeight %>% 
+  filter(Diet == 2) %>% 
+  mutate(weight = weight / 100) %>% 
+  ggplot()+
+  geom_line(aes(x = Time, y = weight, colour = Chick))
+```
+
+### Question 6
+
+For "InsectSprays", filter for "count" greater than 10 and find the proportion of each type of "spray" (hint: use summarise(new_variable = mean(variable == value)))
+```{r transform_q6, exercise = TRUE}
+
+```
+
+```{r transform_q6-solution}
+InsectSprays %>% 
+  filter(count > 10) %>% 
+  summarise(spray_a_prop = mean(spray == "A"),
+            spray_b_prop = mean(spray == "B"),
+            spray_c_prop = mean(spray == "C"),
+            spray_d_prop = mean(spray == "D"),
+            spray_e_prop = mean(spray == "E"),
+            spray_f_prop = mean(spray == "F"))
+```
+
+### Question 7
+
+For "ToothGrowth", find the mean and standard deviation for "length" of each group of "supp" and "dose", then create a line chart of mean "length" for each "dose", coloured by "supp"
+```{r transform_q7, exercise = TRUE}
+
+```
+
+```{r transform_q7-solution}
+ToothGrowth %>% 
+  group_by(supp, dose) %>% 
+  summarise(mean_len = mean(len, na.rm = T),
+            sd_len = sd(len, na.rm = T),
+            number = n()) %>% 
+  ggplot()+
+  geom_line(aes(x = dose, y = mean_len, colour = supp))
+```
+
+### Question 8
+
+Correct the code:
+```{r transform_q8, exercise = TRUE}
+penguins %>% 
+  group_by(penguins, species, island, year) %>% 
+  sumarise(bill_length_mm = average(bill_length_mm)) %>% 
+  ggplot() %>% 
+  geom_point(aes(x = year, y = bill_lentgh_mm, colour = "island", shape = "species"))
+```
+
+```{r transform_q8-solution}
+penguins %>% 
+  group_by(species, island, year) %>% #dataset has been piped in so shouldn't be specified in function
+  summarise(bill_length_mm = mean(bill_length_mm, na.rm = T)) %>% #Use "mean", not "average", correct spelling of "summarise", and use "na.rm = T" to ignore missing values
+  ggplot()+ #for ggplot use "+"
+  geom_point(aes(x = year, y = bill_length_mm, colour = island, shape = species)) #spelling mistake in bill_length_mm and colour and shape should of no quotation marks
+```
+
+### Question 9
+
+Suggest an alternative method to achieve the same output as:
+penguins %>% 
+  group_by(species, island) %>% 
+  summarise(bill_length_mm = mean(bill_length_mm, na.rm = T))
+```{r transform_q9, exercise = TRUE}
+
+```
+
+```{r transform_q9-solution}
+#There are many answers.  These are some of them:
+
+penguins %>% 
+  group_by(species, island) %>% 
+  summarise_at("bill_length_mm", mean, na.rm = T)
+
+penguins %>% 
+  select(species, island, bill_length_mm) %>% 
+  group_by(species, island) %>% 
+  summarise_all(mean, na.rm = T)
+
+penguins %>% 
+  group_by(species, island) %>% 
+  mutate(bill_length_mm = mean(bill_length_mm, na.rm = T)) %>% 
+  distinct(species, island, bill_length_mm) %>% 
+  arrange(species, island)
+```
+
+### Question 10
+
+Using the storms dataset:
+•	Filter for tropical storms only and arrange by most recent
+•	Find the unique options for status and category
+•	Find the average "wind speed" and air pressure for each status
+•	Plot the wind speed vs air pressure and colour by status
+Note: one block of code per task
+```{r transform_q10, exercise = TRUE}
+
+```
+
+```{r transform_q10-solution}
+storms %>% 
+  filter(status == "tropical storm") %>% 
+  arrange(desc(year), desc(month), desc(day), desc(hour))
+
+storms %>% 
+  distinct(status, category)
+
+storms %>% 
+  group_by(status) %>% 
+  summarise(avg_wind = mean(wind, na.rm = T),
+            avg_pressure = mean(pressure, na.rm = T))
+
+storms %>% 
+  ggplot() +
+  geom_point(aes(x = wind, y = pressure, colour = status))
+```
+
+### Question 11
+
+Using the mpg dataset:
+•	Find the unique options for manufacturer, model, and class
+•	For the number of unique model"s each manufacturer has in the dataset
+•	For Toyota, find the average engine displacement (displ), city miles per gallon (cty), and highway miles per gallon (hwy) for each model and class, and make a bar chart of averge displ for each model, coloured by class
+Note: one block of code per task
+```{r transform_q11, exercise = TRUE}
+
+```
+
+```{r transform_q11-solution}
+mpg %>% 
+  distinct(manufacturer, model, class)
+
+mpg %>% 
+  distinct(manufacturer, model) %>% 
+  group_by(manufacturer) %>% 
+  summarise(count = n()) %>% 
+  arrange(desc(count))
+
+mpg %>% 
+  filter(manufacturer == "toyota") %>% 
+  group_by(model, class) %>% 
+  summarise(avg_displ = mean(displ, na.rm = T),
+            avg_cty = mean(cty, na.rm = T),
+            avg_hwy = mean(hwy, na.rm = T)) %>% 
+  ggplot()+
+  geom_col(aes(x = model, y = avg_displ, fill = class))
+```
