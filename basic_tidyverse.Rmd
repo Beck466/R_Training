@@ -1257,4 +1257,91 @@ mpg %>%
   geom_col(aes(x = model, y = avg_displ, fill = class))
 ```
 
+## Data Wrangle
+
+### Tibbles
+
+A tibble is a subtype of a data frame that is optimised for data science appliations.
+Throughout this training the data frames we work with are tibbles.
+
+Tibbles can be created using the tibble() function:
+
+```{r tibble, warning = FALSE}
+tibble(
+  a = c(1, 2, 3, 4),
+  b = c(4, 3, 2, 1),
+  c = c(2, 4, 3, 1)
+)
+```
+
+Another way to create a tibble is the tribble() function (transposed tibble):
+
+```{r tribble, warning = FALSE}
+tribble(~a, ~b, ~c,
+        1, 4, 2,
+        2, 3, 4, 
+        3, 2, 3, 
+        4, 1, 1)
+```
+
+Exercise:
+Create a tibble with the first column being a list of animals, and the second column a country that animal might be found in.
+```{r tibble_2, exercise = TRUE}
+
+```
+
+```{r tibble_2-solution}
+tibble(
+  animal = c("penguin", "elephant", "polar bear", "kiwi"),
+  home = c("antarctica", "africa", "arctic", "nz")
+)
+```
+
+Exercise:
+Create the same dataframe as above using the tribble function
+```{r tribble_2, exercise = TRUE}
+
+```
+
+```{r tribble_2-solution}
+tribble(~animal,      ~home,
+        "penguin",    "antarctica",
+        "elephant",   "africa",
+        "polar bear", "arctic",
+        "kiwi",       "nz")
+```
+
+A tibble can be subsetted to pull out a single variable, or to extract information by name and or position.
+To extract by name:
+```{r subset_1, warning = FALSE}
+BOD$Time
+#OR
+BOD[["Time"]]
+```
+
+To extract by column position:
+```{r subset_2, warning = FALSE}
+BOD[[1]]
+#OR
+BOD[,1]
+```
+
+To extract a row:
+```{r subset_3, warning = FALSE}
+BOD[2,]
+```
+
+To extract by position in dataframe (e.g. row 3, column 2)
+```{r subset_4, warning = FALSE}
+BOD[3,2]
+```
+
+To use this with a pipe use "."
+```{r subset_4, warning = FALSE}
+BOD %>% 
+  .$x
+#OR
+BOD %>% 
+  .[["Time"]]
+```
 
