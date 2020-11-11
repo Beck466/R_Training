@@ -1345,3 +1345,62 @@ BOD %>%
   .[["Time"]]
 ```
 
+Exercise:
+Extract the "carb" column from the "Formaldehyde" dataset
+```{r subset_5, warning = FALSE}
+
+```
+
+```{r subset_5-solution}
+Formaldehyde$carb
+#OR
+Formaldehyde %>% 
+  .$carb
+#OR
+Formaldehyde[["carb"]]
+#OR
+Formaldehyde %>% 
+  .[["carb"]]
+#OR
+Formaldehyde[,1]
+#OR
+Formaldehyde %>% 
+  .[,1]
+```
+
+Exercise:
+Extract the 3rd row from the "Formaldehyde" dataset
+```{r subset_6, warning = FALSE}
+
+```
+
+```{r subset_6-solution}
+Formaldehyde[3,]
+#OR
+Formaldehyde %>% 
+  .[3,]
+```
+
+Exercise:
+Extract the value from the 3rd row and "optden" column in the "Formaldehyde" dataset
+```{r subset_7, warning = FALSE}
+
+```
+
+```{r subset_7-solution}
+Formaldehyde[3,2]
+#OR
+Formaldehyde %>% 
+  .[3,2]
+#OR
+Formaldehyde[3,"optden"]
+#OR
+Formaldehyde %>% 
+  .[3,"optden"]
+```
+
+
+
+
+
+
