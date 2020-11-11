@@ -69,3 +69,5 @@ learnr
   <br>-Pipes
   <br>-Grouping
   <br>-Summarising
+4.  Data Wrangle
+  <br>-Tibbles
