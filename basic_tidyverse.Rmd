@@ -1112,20 +1112,22 @@ ChickWeight %>%
 
 ### Question 6
 
-For "InsectSprays", filter for "count" greater than 10 and find the proportion of each type of "spray" (hint: use summarise(new_variable = mean(variable == value)))
+For "OrchardSprays", filter for "decrease" greater than 50 and find the proportion of each type of "treatment" (hint: use summarise(new_variable = mean(variable == value)))
 ```{r transform_q6, exercise = TRUE}
 
 ```
 
 ```{r transform_q6-solution}
-InsectSprays %>% 
-  filter(count > 10) %>% 
-  summarise(spray_a_prop = mean(spray == "A"),
-            spray_b_prop = mean(spray == "B"),
-            spray_c_prop = mean(spray == "C"),
-            spray_d_prop = mean(spray == "D"),
-            spray_e_prop = mean(spray == "E"),
-            spray_f_prop = mean(spray == "F"))
+OrchardSprays %>% 
+  filter(decrease > 50) %>% 
+  summarise(treatment_a_prop = mean(treatment == "A"),
+            treatment_b_prop = mean(treatment == "B"),
+            treatment_c_prop = mean(treatment == "C"),
+            treatment_d_prop = mean(treatment == "D"),
+            treatment_e_prop = mean(treatment == "E"),
+            treatment_f_prop = mean(treatment == "F"),
+            treatment_g_prop = mean(treatment == "G"),
+            treatment_h_prop = mean(treatment == "H"))
 ```
 
 ### Question 7
