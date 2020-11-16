@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(learnr)
 library(tidyverse)
 library(palmerpenguins)
+library(readxl)
 ```
 
 ## Visualisation
@@ -1400,6 +1401,27 @@ Formaldehyde[3,"optden"]
 Formaldehyde %>% 
   .[3,"optden"]
 ```
+
+### Data Import / Export
+Data can be imported from files from outside of R.  We will look at how to import from csv, xls, or xlsx file.
+
+To import from csv:
+loaded_data <- read_csv("file_path.csv")
+
+To import from xls or xlsx (depending on the file type):
+loaded_data <- read_xls("file_path.xls", sheet = "Sheet 1")
+loaded_data <- read_xlsx("file_path.xlsx", sheet = "Sheet 1")
+
+To write to a csv:
+write_csv(dataset, "file_name.csv")
+
+Data can also be saved as “rds” files, which is a file type that stores a single R object, and retains the formatting or the dataframe.
+
+To create an rds file:
+saveRDS(dataset, "file_name.rds")
+
+To read in a saved rds file:
+loaded_data <- readRDS("file_path.rds")
 
 
 
