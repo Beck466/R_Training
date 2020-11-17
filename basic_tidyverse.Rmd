@@ -1465,5 +1465,39 @@ storms %>%
               values_from = wind)
 ```
 
+Exercise:
+For "diamonds", calculate the average price for each group of "cut" and "color", then pivot the table to have one column per each "color" showing the average price
+```{r pivot_wider_3, exercise = TRUE}
+diamonds %>% 
+  group_by() %>% 
+  summarise(price = ) %>% 
+  pivot_wider(names_from = ,
+              values_from = )
+```
+
+```{r pivot_wider_3-solution}
+diamonds %>% 
+  group_by(cut, color) %>% 
+  summarise(price = mean(price, na.rm = T)) %>% 
+  pivot_wider(names_from = color,
+              values_from = price)
+```
+
+Exercise:
+Using "penguins", change the table shape to have 1 observation of "bill_length_mm", "bill_depth_mm", "flipper_length_mm", and "body_mass_g" per row.
+```{r pivot_longer_3, exercise = TRUE}
+
+```
+
+```{r pivot_longer_3-solution}
+penguins %>% 
+  pivot_longer(cols = c(-species, -island, -sex, -year),
+               names_to = "variable",
+               values_to = "value")
+```
+
+
+
+
 
 
