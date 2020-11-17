@@ -72,3 +72,4 @@ learnr
 4.  Data Wrangle
   <br>-Tibbles
   <br>-Data Import/Export
+  <br>-Pivoting

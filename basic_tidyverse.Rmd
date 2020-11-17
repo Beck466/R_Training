@@ -1423,8 +1423,47 @@ saveRDS(dataset, "file_name.rds")
 To read in a saved rds file:
 loaded_data <- readRDS("file_path.rds")
 
+### Pivoting
 
+# Pivot Longer
+Sometimes column names are not variables, but the values of a variable.
+When analysing data it is more useful to have one observation of each variable per row.
+pivot_longer() can be used to tidy the data into this format
 
+Before pivoting:
+```{r pivot_longer_1, warning = FALSE}
+storms %>% 
+  select(name, status, wind, pressure)
+```
+
+After pivoting:
+```{r pivot_longer_2, warning = FALSE}
+storms %>% 
+  select(name, status, wind, pressure) %>% 
+  pivot_longer(cols = c(-name, -status),
+               names_to = "variable",
+               values_to = "value")
+```
+
+# Pivot Wider
+Pivot_wider() is the opposite of pivot_longer()
+It is used when observations are scattered across rows
+
+Before pivoting:
+```{r pivot_wider_1, warning = FALSE}
+storms %>% 
+  group_by(name, status) %>% 
+  summarise(wind = mean(wind, na.rm = T))
+```
+
+After pivoting:
+```{r pivot_wider_2, warning = FALSE}
+storms %>% 
+  group_by(name, status) %>% 
+  summarise(wind = mean(wind, na.rm = T)) %>% 
+  pivot_wider(names_from = status,
+              values_from = wind)
+```
 
 
 
