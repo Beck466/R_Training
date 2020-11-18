@@ -411,7 +411,7 @@ premium_diamonds <- filter(diamonds, cut == "Premium", color == "I")
 premium_diamonds
 ```
 
-### Filter - Logical Operators
+#### Filter - Logical Operators
 
 Multiple arguments can be combined used “and”, “or”, and “not”
 “and” = “&”, “or” = “|”, “not” = “!’
@@ -1425,7 +1425,7 @@ loaded_data <- readRDS("file_path.rds")
 
 ### Pivoting
 
-# Pivot Longer
+#### Pivot Longer
 Sometimes column names are not variables, but the values of a variable.
 When analysing data it is more useful to have one observation of each variable per row.
 pivot_longer() can be used to tidy the data into this format
@@ -1445,7 +1445,7 @@ storms %>%
                values_to = "value")
 ```
 
-# Pivot Wider
+#### Pivot Wider
 Pivot_wider() is the opposite of pivot_longer()
 It is used when observations are scattered across rows
 
@@ -1498,7 +1498,7 @@ penguins %>%
 
 ### Joining
 
-The joining functions can be used to join tables together based on a common values.
+Joining functions can be used to join tables together based on a common values.
 The following datasets which have values in common in the name column:
 ```{r joining_datasets, warning = FALSE}
 band_members
@@ -1535,6 +1535,7 @@ band_instruments %>%
   anti_join(band_members, by = c("name"))
 ```
 
+Exercise:
 For InsectSprays, join in the table of spray names:
 ```{r left_join_1, exercise = TRUE}
 spray_names <- tribble(~spray_factor, ~spray_name,
@@ -1546,7 +1547,7 @@ spray_names <- tribble(~spray_factor, ~spray_name,
         "F",           "Ecomist")
 
 InsectSprays %>% 
-  left_join(spray_names, by = c("spray" = "spray_factor"))
+  left_join(, by = c( = ))
 ```
 
 ```{r left_join_1-solution}
@@ -1559,6 +1560,106 @@ spray_names <- tribble(~spray_factor, ~spray_name,
         "F",           "Ecomist")
 
 InsectSprays %>% 
-  left_join(, by = c( = ))
+  left_join(spray_names, by = c("spray" = "spray_factor"))
+```
+
+Exercise:
+Join the abbr_status table into the storms dataframe to give a new column with the abbreviation.
+```{r left_join_2, exercise = TRUE}
+abbr_status <- tribble(~status,                ~abbr_status,
+                             "tropical depression",  "DEPR",
+                             "tropical storm",       "STRM",
+                             "hurricane",            "HURR")
+```
+
+```{r left_join_2-solution}
+abbr_status <- tribble(~status,                ~abbr_status,
+                             "tropical depression",  "DEPR",
+                             "tropical storm",       "STRM",
+                             "hurricane",            "HURR")
+
+storms %>% 
+  left_join(abbr_status, by = c("status"))
+```
+
+### Strings
+
+There are functions to make interacting with strings easier.
+
+str_detect()
+Detects patterns in a string
+```{r str_detect, warning = FALSE}
+storms %>% 
+  filter(str_detect(status, "dep"))
+```
+
+str_replace() / str_replace_all()
+Replaces a pattern in a string with another pattern.  str_replace_all replaces all instances of the pattern, whereas str_replace only replaces the first instance
+```{r str_reaplce, warning = FALSE}
+storms %>% 
+  mutate(status = str_replace(status, " ", "_"))
+
+storms %>% 
+  mutate(status = str_replace_all(status, "r", "-"))
+```
+
+substr()
+Extracts characters from a string based on position
+```{r substr, warning = FALSE}
+storms %>% 
+  mutate(status = substr(status, 1, 4))
+```
+
+str_squish()
+Removes extra white space before and after a string, as well as duplicated white space within a string (note: will not remove a single space, only one or more spaces)
+```{r str_squish, warning = FALSE}
+storms %>% 
+  mutate(status = str_squish(status))
+```
+
+tolower() / toupper()
+Converts the string to all lowercase, or all uppercase
+```{r tolower, warning = FALSE}
+storms %>% 
+  mutate(name = tolower(name))
+
+storms %>% 
+  mutate(status = toupper(status))
+```
+
+paste()
+Joins one or more strings together
+```{r paste, warning = FALSE}
+storms %>% 
+  mutate(name = paste(name, "-", year))
+```
+
+Exercise:
+For "diamonds", paste the "color" column into the "cut" column, separated by a "-", convert the new "cut" column to lowercase, and replace any "J's" in "color" with "Z"
+```{r strings_1, exercise = TRUE}
+diamonds %>% 
+  mutate(cut = paste( ),
+         cut = tolower( ),
+         color = str_replace())
+```
+
+```{r strings_1-solution}
+diamonds %>% 
+  mutate(cut = paste(cut, "-", color),
+         cut = tolower(cut),
+         color = str_replace(color, "J", "Z"))
+```
+
+Exercise:
+For "penguins", filter for any islands with an "o", convert "species" to be the first 3 letters of "species" and convert to uppercase
+```{r strings2, exercise = TRUE}
+
+```
+
+```{r strings_2-solution}
+penguins %>% 
+  filter(str_detect(island, "o")) %>% 
+  mutate(species = substr(species, 1, 3),
+         species = toupper(species))
 ```
 

@@ -75,3 +75,4 @@ learnr
   <br>-Data Import/Export
   <br>-Pivoting
   <br>-Joining
+  <br>-Strings
