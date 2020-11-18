@@ -10,6 +10,7 @@ This training was developed to reinforce the learning of R, in conjunction with 
 learnr
 <br>tidyverse
 <br>palmerpenguins
+<br>lubridate
 
 ## Learner Profiles
 ### John the Process Tech
@@ -73,3 +74,4 @@ learnr
   <br>-Tibbles
   <br>-Data Import/Export
   <br>-Pivoting
+  <br>-Joining

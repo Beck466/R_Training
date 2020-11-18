@@ -1496,8 +1496,69 @@ penguins %>%
                values_to = "value")
 ```
 
+### Joining
 
+The joining functions can be used to join tables together based on a common values.
+The following datasets which have values in common in the name column:
+```{r joining_datasets, warning = FALSE}
+band_members
+band_instruments
+```
 
+left_join() retains all rows from the first dataset, and joins in the rows from the second dataset where there is a match between the specified columns:
+```{r left_join, warning = FALSE}
+band_members %>% 
+left_join(band_instruments, by = c("name"))
+```
 
+right_join() retains all rows from the second dataset, joining in matching rows from the first dataset:
+```{r right_join, warning = FALSE}
+band_members %>% 
+  right_join(band_instruments, by = c("name"))
+```
 
+full_join() retains all rows from both datasets:
+```{r full_join, warning = FALSE}
+band_members %>% 
+  full_join(band_instruments, by = c("name"))
+```
+
+inner_join() retains only rows which have a common value in both datasets:
+```{r inner_join, warning = FALSE}
+band_instruments %>% 
+  inner_join(band_members, by = c("name"))
+```
+
+anti_join() retains rows which are in one or the other datasets (not both):
+```{r anti_join, warning = FALSE}
+band_instruments %>% 
+  anti_join(band_members, by = c("name"))
+```
+
+For InsectSprays, join in the table of spray names:
+```{r left_join_1, exercise = TRUE}
+spray_names <- tribble(~spray_factor, ~spray_name,
+        "A",           "Black Flag",
+        "B",           "Raid",
+        "C",           "Mortein",
+        "D",           "Expra",
+        "E",           "Pestrol",
+        "F",           "Ecomist")
+
+InsectSprays %>% 
+  left_join(spray_names, by = c("spray" = "spray_factor"))
+```
+
+```{r left_join_1-solution}
+spray_names <- tribble(~spray_factor, ~spray_name,
+        "A",           "Black Flag",
+        "B",           "Raid",
+        "C",           "Mortein",
+        "D",           "Expra",
+        "E",           "Pestrol",
+        "F",           "Ecomist")
+
+InsectSprays %>% 
+  left_join(, by = c( = ))
+```
 
