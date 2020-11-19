@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(learnr)
 library(tidyverse)
 library(palmerpenguins)
-library(readxl)
+library(lubridate)
 ```
 
 ## Visualisation
@@ -1595,7 +1595,7 @@ storms %>%
 
 str_replace() / str_replace_all()
 Replaces a pattern in a string with another pattern.  str_replace_all replaces all instances of the pattern, whereas str_replace only replaces the first instance
-```{r str_reaplce, warning = FALSE}
+```{r str_replace, warning = FALSE}
 storms %>% 
   mutate(status = str_replace(status, " ", "_"))
 
@@ -1652,7 +1652,7 @@ diamonds %>%
 
 Exercise:
 For "penguins", filter for any islands with an "o", convert "species" to be the first 3 letters of "species" and convert to uppercase
-```{r strings2, exercise = TRUE}
+```{r strings)2, exercise = TRUE}
 
 ```
 
@@ -1662,4 +1662,136 @@ penguins %>%
   mutate(species = substr(species, 1, 3),
          species = toupper(species))
 ```
+
+### Dates and Times
+The lubridate package has helpful functions for dealing with dates and times
+
+Converting a character string to a date:
+```{r dates, warning = FALSE}
+ymd("2020-08-01")
+dmy(01082020)
+mdy("08/01/20")
+```
+
+Converting a character string to a date/time:
+```{r dates_1, warning = FALSE}
+ymd_hm("2020-Aug-01 18:00")
+dmy_hms(01082020180000)
+mdy_h("08/01/20 6pm")
+```
+
+Using as.POSIXct:
+```{r dates_2, warning = FALSE}
+as.POSIXct("2020-Aug-01 18:00", format = "%Y-%b-%d %H:%M")
+```
+
+There can be timezone issues with dates – although the timezone isn’t shown, there is a timezone attached.
+The lubridate (ymd()) functions by default set the timezone to UTC
+If there are date issues, try setting the timezone to “UTC”
+
+Elements of the date/time can be pulled out:
+Extracting month:
+```{r month, warning = FALSE}
+ymd(20200801) %>% 
+  month()
+```
+
+Extracting year:
+```{r year, warning = FALSE}
+ymd(20200801) %>% 
+  year()
+```
+
+To add and subtract dates use the duration functions
+Subtracting a year:
+```{r dates_3, warning = FALSE}
+ymd(20200801) - dyears(1)
+```
+
+Subtracting 2 days:
+```{r dates_4, warning = FALSE}
+ymd(20200801) - ddays(2)
+```
+
+Dates can be rounded
+
+round_date() rounds up or down to the nearest specified time period:
+```{r round_date, warning = FALSE}
+ymd(20200818) %>% 
+  round_date("month")
+```
+
+floor_date() rounds down to the last nearest time period:
+```{r floor_date, warning = FALSE}
+ymd_hms("2020-08-14 12:58:00") %>% 
+  floor_date("hour")
+```
+
+ceiling_date() rounds up to the next time period:
+```{r ceiling_date, warning = FALSE}
+ymd_hms("2020-08-14 12:14:00") %>% 
+  ceiling_date("hour")
+```
+
+Current times
+To get the current Date:
+```{r current_date, warning = FALSE}
+Sys.Date()
+```
+
+To get the current time:
+```{r current_time, warning = FALSE}
+Sys.time()
+```
+
+Example:
+Using the functions in with a table:
+```{r dates_5, warning = FALSE}
+table_with_date <- tribble(~date_time,       ~value,
+                           "20200801 12:30", 23,
+                           "20200902 18:45", 34,
+                           "20201003 06:18", 12,
+                           "20201004 22:47", 18)
+
+table_with_date %>% 
+  mutate(date_time = ymd_hm(date_time),
+         month = month(date_time),
+         rounded_date = floor_date(date_time, "day"))
+```
+
+Exercise:
+For "storms", turn the date_time column into a date/time format.  Create a new column of month, create a new column of the same time but for the previous day, and create a new column calculating the time since the event till now.
+```{r dates_6, exercise = TRUE}
+storms %>% 
+  mutate(date_time = paste(day, month, year, hour),
+         date_time =   ,
+         month =   ,
+         previous_day = date_time - ,
+         time_since_event =   - date_time)
+```
+
+```{r dates_6-solution}
+storms %>% 
+  mutate(date_time = paste(day, month, year, hour),
+         date_time = dmy_h(date_time),
+         month = month(date_time),
+         previous_day = date_time - days(1),
+         time_since_event = Sys.time() - date_time)
+```
+
+Exercise:
+For "airquality", assuming the year is 2004, create a date column.  Create a column with the date rounded down to the first of the month.  Find the number of days between the date and the first of the month.
+```{r dates_7, exercise = TRUE}
+
+```
+
+```{r dates_7-solution}
+airquality %>% 
+  mutate(date = paste(Day, Month, "2004"),
+         date = dmy(date),
+         rounded_month = floor_date(date, "month"),
+         date_difference = date - rounded_month)
+```
+
+
 
