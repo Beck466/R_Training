@@ -2310,31 +2310,91 @@ penguins %>%
   unnest(c(bill_length_mm, bill_depth_mm, flipper_length_mm))
 ```
 
+# Test Your Knowledge
 
+### Question 1
+```{r program_q1, echo = FALSE}
+question("What is the correct way to create a function?",
+  answer("new_function = function(input1, input2) = input1 * input2", message = "Use '{ }' to designate what the function does)"),
+  answer("new_function = function(input1, input2) {input_1 * input_2}", message = "inputs used in function need to match the inputs to the function"),
+  answer("new_function = function(input1, input2) {input1 * input2}", correct = TRUE),
+  answer("new_function = c(input1, input2) {input1 * input2}", message = "To create a function need to specify that it is a function"))
+```
 
-Exercise:
-•	Using the starwars dataset
-o	Filter out NA’s from the birth year and hair colour columns
-o	Change the birth year column type from numeric to character
-o	Separate the hair_color column into one colour per row (hint: use the separate_rows function)
-o	Convert the hair_color column to a factor
-o	Create a function to multiply height by mass and then use map to apply it to the dataset to create a new column.
-```{r}
+### Question 2
+```{r program_q2, echo = FALSE}
+question("How should map be used?",
+  answer("df %>% mutate(new_column = map(function, column_a))", message = "The input should be specified before the function"),
+  answer("df %>% mutate(new_column = map(column_a, function))", correct = TRUE),
+  answer("df %>% mutate(new_column = map2(column_a, function, input_2 = 2))", message = "map2 is only used if there are 2 columns being mapped into the function"),
+  answer("df %>% mutate(new_column = map(column_a, function, input_2 = 2))", correct = TRUE))
+```
+
+### Question 3
+Correct the code
+```{r program_q3, exercise = TRUE}
+calc_dosage <- function(conc, delivery)(
+  conc * dosage
+)
+
+CO2 %>% 
+  as_tibble() %>% 
+  mutate(dosage = map(conc, delivery, calc_dosage())) %>% 
+  unnest(dosage)
+```
+
+```{r program_q3-solution}
+calc_dosage <- function(conc, delivery){   # need to use "{ }" to specify the function
+  conc * delivery                          #variable names need to match the input names
+}
+
+CO2 %>% 
+  as_tibble() %>% 
+  mutate(dosage = map2(conc, uptake, calc_dosage)) %>%  #correct function is map, inputs need to match column names, just the function name is used
+  unnest(dosage)
+```
+
+### Question 4
+Create a function called "calculate_dosage" which takes in "dosage" and "supplement" as inputs.  If "supplement" is equal to "VC" then multiply "dosage" by 2, or if "supplement" is equal to "OJ" then leave "dosage" the same.  Map the function over the "ToothGrowth" dataset selecting the relevant columns as inputs, creating a new column called "calc_dosage".
+```{r program_q4, exercise = TRUE}
+
+```
+
+```{r program_q4-solution}
+calculate_dosage <- function(dosage, supplement){
+  if(supplement == "VC"){
+    calc_dose <- dosage * 2
+  } else if(supplement == "OJ"){
+    calc_dose <- dosage
+  }
+  
+  calc_dose
+  }
+
+ToothGrowth %>% 
+  mutate(calc_dosage = map2(dose, supp, calculate_dosage)) %>% 
+  unnest(calc_dosage)
+```
+
+### Question 5
+Using the starwars dataset, filter out NA’s from the "birth_year" and "hair_color" columns.  Change the "birth_year" column type from numeric to character, and separate the "hair_color" column into one colour per row (hint: use the separate_rows function).  Create a function to multiply "height" by "mass" and then use map to apply it to the dataset to create a new column.
+```{r program_q5, exercise = TRUE}
+
+```
+
+```{r program_q5-solution}
+height_mass <- function(input1, input2){
+  input1 * input2
+}
+
 starwars %>% 
   filter(!is.na(birth_year),
          !is.na(hair_color)) %>% 
   mutate(birth_year = as.character(birth_year)) %>% 
   separate_rows(hair_color) %>% 
-  arrange(height) %>% 
-  mutate(hair_color_new = factor(hair_color, levels = c("white","brown"))) %>% 
-  arrange(hair_color) %>% 
-  mutate(height_mass = function1(height, mass))
-
-function1 <- function(input1, input2){
-  input1 * input2
-}
-
+  mutate(height_mass = height_mass(height, mass))
 ```
+
 
 
 
