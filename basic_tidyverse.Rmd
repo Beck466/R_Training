@@ -1796,12 +1796,13 @@ airquality %>%
 ### Case When
 case_when can be used as a multiple if else statement
 It contains a list of if else conditions and the value to be assigned to the variable if the condition is met
+
+For "storms", change the "month" column to say "June", "July", or "August", or "Not Winter" depending on its value.
 ```{r case_when, warning = FALSE}
 storms %>% 
   mutate(month = case_when(
     month == 6 ~ "June",
     month == 7 ~ "July",
-    month == 6 ~ "Some month",
     month == 8 ~ "August",
     TRUE ~ "Not Winter"
   ))
@@ -1810,14 +1811,15 @@ storms %>%
 The TRUE argument specifies what to do if no conditions are met
 The conditions are evaluated in order
 If there is only one condition then consider using an ifelse() statement instead
+
+For storms, change the month column to be either "June" or "Not June", based on its value.
 ```{r ifelse, warning = FALSE}
 storms %>% 
-  mutate(month = ifelse(month == 6, "June", 
-                        ifelse(month == 7, "July", "Not June or July")))
+  mutate(month = ifelse(month == 6, "June", "Not June")))
 ```
 
 Exercise:
-For "diamonds", create a new column called "cut_quality"
+For "diamonds", create a new column called "cut_quality", where if cut is "Ideal" or "Premium" then the value is "high", if cut is "Good" or "Very Good" the value is "average", and if cut is "Fair then value is "low"
 ```{r case_when_2, exercise = TRUE}
 
 ```
@@ -1844,7 +1846,90 @@ penguins %>%
 
 ## Test Your Knowledge
 
-Question 8:
+### Question 1
+```{r wrangle_q1, echo = FALSE}
+question("What is the correct way to join two dataframes?",
+  answer("band_members %>% left_join(band_instruments, by = c(name))", message = "Joining variables must be a character string"),
+  answer("band_members %>% left_join(band_instruments, by = c('name'))", correct = TRUE),
+  answer("band_members %>% left_join(band_instruments, by = c('name' = 'plays'))", message = "Need to specify the columns which have common values to join by"),
+  answer("band_members %>% left_join(band_instruments, by = 'name')", message = "Need to specify the joining columns with a list - 'c()'"))
+```
+
+### Question 2
+```{r wrangle_q2, echo = FALSE}
+question("What is the correct way to filter for a string pattern?",
+  answer("storms %>% filter(str_detect('trop'))", message = "Need to specify which column to search in"),
+  answer("storms %>% filter(str_detect('trop', status))", message = "Need to specify column before the pattern"),
+  answer("storms %>% filter(str_detect(status, 'trop'))", correct = TRUE),
+  answer("storms %>% filter(str_extract(status, 'trop'))", message = "The correct function is str_extract()"))
+```
+
+### Question 3
+```{r wrangle_q3, echo = FALSE}
+question("Which will transform a character string into a date format?",
+  answer("ymd_hms('2020-31-12 14:47')", message = "The function needs to match the character string - correct function is ydm_hm"),
+  answer("ymd_hm('20/Dec/31 14:47')", correct = TRUE),
+  answer("ymdhms('2020-12-31 14:47:00')", message = "The correct function has an '-'"),
+  answer("ymd_hms('2020-12-31 14:47:00')", correct = TRUE))
+```
+
+### Question 4
+
+Correct the code:
+```{r wrangle_q4, exercise = TRUE}
+HairEyeColor %>% 
+  as_tibble() %>% 
+  filter(str_detect("Bl")) %>% 
+  mutate(Sex = substr(1, 1, Sex)) %>% 
+  mutate(hair_eye = paste(Hair, -, Eye)) %>% 
+  select(-Hair, -Eye, -Sex) %>% 
+  group_by(haireye) %>% 
+  summarise(n = sum(n)) %>% 
+  pivot_wider(names_from(hair_eye),
+              values_from(n))
+```
+
+```{r wrangle_q4-solution}
+HairEyeColor %>% 
+  as_tibble() %>% 
+  filter(str_detect(Hair, "Bl")) %>% #need to specify which column
+  mutate(Sex = substr(Sex, 1, 1)) %>% #need to specify column first
+  mutate(hair_eye = paste(Hair, "-", Eye)) %>% #need to use quotations around the "-"
+  select(-Hair, -Eye, -Sex) %>% 
+  group_by(hair_eye) %>% #correct spelling
+  summarise(n = sum(n)) %>% 
+  pivot_wider(names_from = hair_eye, # need to use "="
+              values_from = n) 
+```
+
+### Question 5
+Using "penguins", join in a table called "nearest_locations" by "island."  Change the "island" column to include the "nearest_shore", separated by a "-".  select the "species", "island", "sex", and "body_mass_g" columns, and group by all except "body_mass_g".  Find the average "body_mass_g" per group, filter for "sex" is not NA, then change the table to have one column of average "body_mass_g" for "male" and one for "female."
+```{r wrangle_q5, exercise = TRUE}
+nearest_locations <- tribble(~island,     ~nearest_shore,
+                             "Biscoe",    "Graham Land",
+                             "Torgersen", "Litchfield Island",
+                             "Dream",     "Cape Monaco")
+```
+
+```{r wrangle_q5-solution}
+nearest_locations <- tribble(~island,     ~nearest_shore,
+                             "Biscoe",    "Graham Land",
+                             "Torgersen", "Litchfield Island",
+                             "Dream",     "Cape Monaco")
+
+penguins %>% 
+  left_join(nearest_locations, by = c("island")) %>% 
+  mutate(island = paste(island, "-", nearest_shore)) %>% 
+  select(species, island, sex, body_mass_g) %>% 
+  group_by(species, island, sex) %>% 
+  summarise_all(mean, na.rm = T) %>% 
+  filter(!is.na(sex)) %>% 
+  pivot_wider(names_from = sex,
+              values_from = body_mass_g)
+```
+
+### Question 6
+
 •	Create a dataframe called descriptions with the following info:
 status	                description
 tropical depression	    Tropical cyclone < 33 knots
@@ -1859,16 +1944,15 @@ hurricane	              Tropical cyclone > 64 knots
 •	Use pivot_wider to make each new_status it’s own column with average wind speed as the values
 •	Change the name “Belle” to “Bella”
 •	Filter for only names with a “z” in them
-```{r wrangle_q8, exrcise = TRUE}
+```{r wrangle_q6, exrcise = TRUE}
 
 ```
 
-```{r wrangle_q8-solution}
+```{r wrangle_q6-solution}
 descriptions <- tribble(~status, ~description,
 "tropical depression", "Tropical cyclone < 33 knots",
 "tropical storm", "Tropical cyclone between 34 and 63 knots",
 "hurricane", "Tropical cyclone > 64 knots")
-
 
 storms %>% 
 left_join(descriptions, by = c("status" = "status")) %>%
@@ -1884,6 +1968,5 @@ avg_wind >= 33 & avg_wind <= 63 ~ "tropical storm")) %>%
               values_from = avg_wind) %>% 
   mutate(name = str_replace(name, "Belle", "Bella")) %>% 
   filter(str_detect(name, "z"))
-
 ```
 
