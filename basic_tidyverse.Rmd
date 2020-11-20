@@ -1921,8 +1921,8 @@ arrange(region_abbr)
 ```
 
 Exercise:
-For storms find the average wind per status and make a bar chart of wind per status
-Order the bars from smallest to largest by converting status to a factor
+For "storms" find the average "wind" per "status" and make a bar chart of "wind" per "status"
+Order the bars from smallest to largest by converting "status" to a factor
 ```{r factors_2, exercise = TRUE}
 storms %>% 
   arrange(desc(wind)) %>% 
@@ -1939,7 +1939,7 @@ storms %>%
   geom_point(aes(x = status, y = wind))
 ```
 
-For penguins find the average body_mass_g per species and make a bar chart of body_mass_g per species
+For "penguins" find the average "body_mass_g" per "species" and make a bar chart of "body_mass_g" per "species"
 Order the bars from largest to smallest
 ```{r factors_3, exercise = TRUE}
 
@@ -2014,15 +2014,33 @@ HairEyeColor %>%
 ```
 
 ### Question 5
-Using "penguins", join in a table called "nearest_locations" by "island."  Change the "island" column to include the "nearest_shore", separated by a "-".  select the "species", "island", "sex", and "body_mass_g" columns, and group by all except "body_mass_g".  Find the average "body_mass_g" per group, filter for "sex" is not NA, then change the table to have one column of average "body_mass_g" for "male" and one for "female."
+
+For "mtcars", find the average mpg per group of cyl and hp.  Convert hp to a factor, with the levels taken from the dataset in the order they appear when arranged by mpg.  Create a plot of hp vs mpg coloured by cyl.
 ```{r wrangle_q5, exercise = TRUE}
+
+```
+
+```{r wrangle_q5-solution}
+mtcars %>% 
+  group_by(cyl, hp) %>% 
+  summarise(mpg = mean(mpg, na.rm = T)) %>% 
+  arrange(mpg) %>% 
+  mutate(hp = factor(hp, levels = unique(hp))) %>% 
+  ggplot()+
+  geom_point(aes(x = hp, y = mpg, colour = cyl))
+```
+
+### Question 6
+
+Using "penguins", join in a table called "nearest_locations" by "island."  Change the "island" column to include the "nearest_shore", separated by a "-".  select the "species", "island", "sex", and "body_mass_g" columns, and group by all except "body_mass_g".  Find the average "body_mass_g" per group, filter for "sex" is not NA, then change the table to have one column of average "body_mass_g" for "male" and one for "female."
+```{r wrangle_q6, exercise = TRUE}
 nearest_locations <- tribble(~island,     ~nearest_shore,
                              "Biscoe",    "Graham Land",
                              "Torgersen", "Litchfield Island",
                              "Dream",     "Cape Monaco")
 ```
 
-```{r wrangle_q5-solution}
+```{r wrangle_q6-solution}
 nearest_locations <- tribble(~island,     ~nearest_shore,
                              "Biscoe",    "Graham Land",
                              "Torgersen", "Litchfield Island",
@@ -2039,7 +2057,7 @@ penguins %>%
               values_from = body_mass_g)
 ```
 
-### Question 6
+### Question 7
 
 •	Create a dataframe called descriptions with the following info:
 status	                description
@@ -2055,11 +2073,11 @@ hurricane	              Tropical cyclone > 64 knots
 •	Use pivot_wider to make each new_status it’s own column with average wind speed as the values
 •	Change the name “Belle” to “Bella”
 •	Filter for only names with a “z” in them
-```{r wrangle_q6, exrcise = TRUE}
+```{r wrangle_q7, exrcise = TRUE}
 
 ```
 
-```{r wrangle_q6-solution}
+```{r wrangle_q7-solution}
 descriptions <- tribble(~status, ~description,
 "tropical depression", "Tropical cyclone < 33 knots",
 "tropical storm", "Tropical cyclone between 34 and 63 knots",
