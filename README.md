@@ -77,3 +77,4 @@ learnr
   <br>-Joining
   <br>-Strings
   <br>-Dates & Times
+  <br>-Case When

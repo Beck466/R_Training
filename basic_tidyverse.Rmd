@@ -1745,7 +1745,7 @@ Sys.time()
 ```
 
 Example:
-Using the functions in with a table:
+Using the functions with a table:
 ```{r dates_5, warning = FALSE}
 table_with_date <- tribble(~date_time,       ~value,
                            "20200801 12:30", 23,
@@ -1793,5 +1793,97 @@ airquality %>%
          date_difference = date - rounded_month)
 ```
 
+### Case When
+case_when can be used as a multiple if else statement
+It contains a list of if else conditions and the value to be assigned to the variable if the condition is met
+```{r case_when, warning = FALSE}
+storms %>% 
+  mutate(month = case_when(
+    month == 6 ~ "June",
+    month == 7 ~ "July",
+    month == 6 ~ "Some month",
+    month == 8 ~ "August",
+    TRUE ~ "Not Winter"
+  ))
+```
 
+The TRUE argument specifies what to do if no conditions are met
+The conditions are evaluated in order
+If there is only one condition then consider using an ifelse() statement instead
+```{r ifelse, warning = FALSE}
+storms %>% 
+  mutate(month = ifelse(month == 6, "June", 
+                        ifelse(month == 7, "July", "Not June or July")))
+```
+
+Exercise:
+For "diamonds", create a new column called "cut_quality"
+```{r case_when_2, exercise = TRUE}
+
+```
+
+```{r case_when_2-solution}
+diamonds %>% 
+  mutate(cut_quality = case_when(cut == "Ideal" | cut == "Premium" ~ "high",
+                                 cut == "Good" | cut == "Very Good" ~ "average",
+                                 cut == "Fair" ~ "low"))
+```
+
+Exercise:
+For "penguins", create a column that indicates if a penguin is small, medium, or large.  If body_mass_g is less than 3500 then it is small, if it is over 5000 then it is large, and everything else if average.
+```{r case_when_3, exercise = TRUE}
+
+```
+
+```{r case_when_3-solution}
+penguins %>% 
+  mutate(size = case_when(body_mass_g < 3500 ~ "small",
+                          body_mass_g >= 5000 ~ "large",
+                          TRUE ~ "average"))
+```
+
+## Test Your Knowledge
+
+Question 8:
+•	Create a dataframe called descriptions with the following info:
+status	                description
+tropical depression	    Tropical cyclone < 33 knots
+tropical storm	        Tropical cyclone between 34 and 63 knots
+hurricane	              Tropical cyclone > 64 knots
+•	Join the newly created descriptions dataframe into the storms dataframe
+•	In the new storms dataframe, create an additional datetime column using the existing columns in the dataframe
+•	Select the name, description, date_time, and wind columns only
+•	Group by name and description and find the average wind speed for each group
+•	Create a column to assign a new_status based on wind. If wind is less than 33 call it “tropical depression”, if wind is above 63 knots then call it “hurricane”, and anything in between call “tropical storm”.
+•	Find the distinct values for the name, new_status, and average wind columns only
+•	Use pivot_wider to make each new_status it’s own column with average wind speed as the values
+•	Change the name “Belle” to “Bella”
+•	Filter for only names with a “z” in them
+```{r wrangle_q8, exrcise = TRUE}
+
+```
+
+```{r wrangle_q8-solution}
+descriptions <- tribble(~status, ~description,
+"tropical depression", "Tropical cyclone < 33 knots",
+"tropical storm", "Tropical cyclone between 34 and 63 knots",
+"hurricane", "Tropical cyclone > 64 knots")
+
+
+storms %>% 
+left_join(descriptions, by = c("status" = "status")) %>%
+mutate(datetime = make_datetime(year, month, day, hour)) %>%
+select(name, description, datetime, wind) %>%
+group_by(name, description) %>%
+summarise(avg_wind = mean(wind, na.rm = T)) %>%
+mutate(status = case_when(avg_wind < 33 ~ "tropical depression",
+avg_wind > 63 ~ "hurricane",
+avg_wind >= 33 & avg_wind <= 63 ~ "tropical storm")) %>% 
+  distinct(name, status, avg_wind) %>% 
+  pivot_wider(names_from = status,
+              values_from = avg_wind) %>% 
+  mutate(name = str_replace(name, "Belle", "Bella")) %>% 
+  filter(str_detect(name, "z"))
+
+```
 
