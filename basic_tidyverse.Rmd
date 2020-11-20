@@ -1844,7 +1844,7 @@ penguins %>%
                           TRUE ~ "average"))
 ```
 
-## Test Your Knowledge
+# Test Your Knowledge
 
 ### Question 1
 ```{r wrangle_q1, echo = FALSE}
@@ -1970,3 +1970,120 @@ avg_wind >= 33 & avg_wind <= 63 ~ "tropical storm")) %>%
   filter(str_detect(name, "z"))
 ```
 
+## Program
+
+### Functions
+Functions allow code to be automated and reproducible.
+If code is repeated, functions allow the code to be stored in a function and applied by calling the function.
+If the code needs to be changed, it then only needs to be changed in one place.
+
+Create a function to multiply one variable by another
+```{r functions, warning = FALSE}
+multiplication <- function(input1, input2){
+  input1 * input2
+}
+
+x = 4
+y = 6
+
+multiplication(input1 = x, input2 = y)
+```
+
+Use the function above to create a new column in storms of wind x pressure
+```{r functions_2, warning = FALSE}
+storms %>% 
+  mutate(wind_pressure = multiplication(wind, pressure))
+```
+
+Adding more complication to the function
+```{r functions_3, warning = FALSE}
+multiplication <- function(input1, input2){
+  x = input1 /300
+  y = input2 * input1
+  
+  x*y
+}
+
+storms %>% 
+  mutate(wind_pressure = multiplication(wind, pressure))
+```
+
+Can also use if else statements within a function to change which calculation to use:
+```{r functions_4, warning = FALSE}
+multiplication <- function(input1, input2, input3){
+  if(input1 <100){
+  x = input1 /300
+  y = input2 *100
+  } else if(input1 > 300) {
+    x = input1
+  y = input2 *100
+  } else {
+    x = input1
+  y = input2
+  }
+  
+  x*y
+}
+
+storms %>% 
+  mutate(wind_pressure = multiplication(wind, pressure, status))
+```
+
+A function can also be used to perform a calculation on an entire dataframe
+```{r functions_5, warning = FALSE}
+storms_engineering <- function(df){
+  df %>% 
+  select(name, status, wind) %>% 
+  filter(status == "hurricane")
+}
+
+storms_engineering(storms)
+```
+
+Exercise:
+Create a function to divide column_a by 100, multiply column_b by 100, then return the first variable multiplied by the second variable.  Apply this to diamonds using price and carat as the inputs.
+```{r functions_6, exercise = TRUE}
+price_carat <- function( ){
+  x = 
+  y = 
+  
+  
+}
+
+diamonds %>% 
+  mutate(new_col = price_carat(  ))
+```
+
+```{r functions_6-solution}
+price_carat <- function(var1, var2){
+  x = var1 / 100
+  y = var2 * 100
+  
+  x*y
+}
+
+diamonds %>% 
+  mutate(new_col = price_carat(price, carat))
+```
+
+Exercise:
+Modify the function above to only divide "column_a" if it is over 1000.  "column_b" should still be multiplied by 100
+```{r functions_7, exercise = TRUE}
+
+```
+
+```{r functions_7-solution}
+price_carat <- function(var1, var2){
+  if(var1 > 1000){
+  x = var1 / 100
+  } else {
+  x = var1
+  }
+  y = var2 * 100
+  
+  x*y
+}
+
+diamonds %>% 
+  mutate(new_col = price_carat(price, carat))
+```
