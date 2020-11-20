@@ -11,6 +11,9 @@ library(learnr)
 library(tidyverse)
 library(palmerpenguins)
 library(lubridate)
+library(plotly)
+library(DT)
+library(gt)
 ```
 
 ## Visualisation
@@ -2395,7 +2398,106 @@ starwars %>%
   mutate(height_mass = height_mass(height, mass))
 ```
 
+## Presentation
 
+### Plotly
+The plotly package can be used with ggplot to make the plots more interactive
+```{r plotly, warning = FALSE}
+ggplotly(ggplot(storms)+
+  geom_point(aes(x = wind, y = pressure, colour = status)))
+```
+
+The ggplotly needs to wrap around the whole function, even when piping in data
+```{r plotly_2, warning = FALSE}
+ggplotly(storms %>% 
+           filter(name == "Belle") %>% 
+  ggplot()+
+  geom_point(aes(x = wind, y = pressure, colour = status)))
+```
+
+Alternatively could save the plot as an object, then use within the ggplotly function
+```{r plotly_3, warning = FALSE}
+plot1 <- storms %>% 
+           filter(name == "Belle") %>% 
+  ggplot()+
+  geom_point(aes(x = wind, y = pressure, colour = status))
+
+ggplotly(plot1)
+```
+
+The hover over text can be adjusted using the text argument
+```{r plotly_4, warning = FALSE}
+ggplotly(storms %>% 
+           filter(name == "Belle") %>% 
+  ggplot()+
+  geom_point(aes(x = wind, y = pressure, colour = status, text = paste(name,
+                                                                       "<br>Wind: ", wind,
+                                                                       "<br>Pressure", pressure))),
+  tooltip = c("text")
+  )
+```
+
+Exercise:
+For "diamonds", create a plot of "carat" vs "price" and colour by "cut".  Turn the plot into a ggplotly plot, an adjust the hover over text
+```{r plotly_5, exercise = TRUE}
+diamonds %>% 
+  ggplot()+
+  geom_point(aes(x = carat, y = price, colour = cut, text = paste())), 
+  tooltip = c( )
+```
+
+```{r plotly_5-solution}
+ggplotly(diamonds %>% 
+  ggplot()+
+  geom_point(aes(x = carat, y = price, colour = cut, text = paste(cut,
+                                                                  "<br>Clarity", clarity,
+                                                                  "<br>Price: ", price,
+                                                                  "<br>Carat: ", carat))), 
+  tooltip = c("text"))
+```
+
+Exercise:
+For "penguins", plot the average "body_mass_g" per "species" on a bar chart and colour by "species."  Turn the plot into a ggplotly, and adjust the hover over text
+```{r plotly_6, exercise = TRUE}
+
+```
+
+```{r plotly_6-solution}
+ggplotly(penguins %>% 
+  group_by(species) %>% 
+  summarise(avg_body_mass = mean(body_mass_g, na.rm = T)) %>% 
+  ggplot()+
+  geom_col(aes(x = species, y = avg_body_mass, fill = species, text = paste(species,
+                                                                            "<br>Average Body Mass: ", avg_body_mass))),
+  tooltip = c("text"))
+```
+
+
+
+DT
+```{r}
+storms %>% 
+  datatable()
+```
+DT with colour
+```{r}
+storms %>% 
+  datatable() %>% 
+formatStyle(
+    'status',
+    backgroundColor = styleEqual(
+      c("tropical storm", "tropical depression", "hurricane"), 
+      c('lightblue', 'lightgreen', 'lightpink')
+    ))
+```
+gt
+```{r}
+storms %>% 
+  select(name, status) %>% 
+  head(5) %>% 
+  gt()
+
+```
 
 
 

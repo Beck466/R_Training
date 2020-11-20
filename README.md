@@ -11,6 +11,9 @@ learnr
 <br>tidyverse
 <br>palmerpenguins
 <br>lubridate
+<br>plotly
+<br>DT
+<br>gt
 
 ## Learner Profiles
 ### John the Process Tech
@@ -83,3 +86,5 @@ learnr
 5.  Program
   <br>-Functions
   <br>-Mapping
+6.  Presentation
+  <br>-Plotly
