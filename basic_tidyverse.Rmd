@@ -337,12 +337,12 @@ ggplot(data = ToothGrowth) + #spelling mistake, "+" missing
 ## Coding Basics
 
 R can be used as a calculator
-```{r calculator}
+```{r calculator, warning = FALSE}
 5 * 6
 ```
 
 Values or objects can be stored by assigning them to a name.  Run the object name to call the output of the object
-```{r storing_objects}
+```{r storing_objects, warning = FALSE}
 variable <- 5
 object <- 2 * 5
 
@@ -353,6 +353,15 @@ object
 -Names can include capital letters, numbers, underscores, and full stops.  Do not use special characters or spaces.
 -Snake case is recommended: i_am_snake_case (all lower case with underscores separating words)
 -Make object names descriptive
+
+To see what a dataframe looks like:
+```{r view_dataframe, warning = FALSE}
+str(storms)
+storms
+head(storms, 3)
+glimpse(storms)
+view(storms)
+```
 
 Functions come in the form of function_name(arg1 = val1, arg2 = val2, ...)
 In R, brackets always come in pairs, as well as quotation marks
@@ -1844,6 +1853,108 @@ penguins %>%
                           TRUE ~ "average"))
 ```
 
+### Data Types
+To change a column from one data type to another:
+```{r data_types, warning = FALSE}
+storms %>% 
+  mutate(month = as.character(month),
+         month = as.numeric(month),
+         name = as.numeric(name))
+```
+
+Exercise:
+Select the 3rd character from the clarity column and convert the column to numeric
+```{r data_types_1, exercise = TRUE}
+diamonds %>% 
+  mutate(clarity = substr(clarity, 3, 3),
+         clarity =   (clarity))
+```
+
+```{r data_types_1-solution}
+diamonds %>% 
+  mutate(clarity = substr(clarity, 3, 3),
+         clarity = as.numeric(clarity))
+```
+
+Exercise:
+In"penguins", convert the year column to be a character
+```{r data_types_2, exercise = TRUE}
+
+```
+
+```{r data_types_2-solution}
+penguins %>% 
+  mutate(year = as.character(year))
+```
+
+### Factors
+Factors are useful to set the order (or "levels") of a variable.
+If a dataframe is arranged it by a column of type character, it will arrange by alphabetical order.  By converting to a factor, the levels of the factor can be manually defined.
+```{r factors, warning = FALSE}
+regions <- tribble(~region_name,          ~region_abbr
+                   "Upper North",				  "UNI",
+                   "Central North",				"CNI",
+                   "Lower North",			    "LNI", 
+                   "Upper South",         "USI",
+                   "Central South",				"CSI",
+                   "Lower South",				  "LSI")
+
+regions %>% 
+  mutate(region_abbr = factor(region_abbr, levels = c("UNI", "CNI", "LNI", "USI", "CSI", "LSI"))) %>% 
+  arrange(region_abbr)
+```
+
+Factors can also be specified by the order in which they first appear in the dataset
+```{r factors_1, warning = FALSE}
+regions <- tribble(~region_name,          ~region_abbr, ~id, 
+                   "Upper North",				  "UNI", 1,
+                   "Central North",				"CNI", 2,
+                   "Lower North",			    "LNI",4, 
+                   "Upper South",         "USI",3,
+                   "Central South",				"CSI",5,
+                   "Lower South",				  "LSI",6)
+
+regions %>% 
+  arrange(desc(id)) %>% 
+  mutate(region_abbr = factor(region_abbr, levels = unique(region_abbr))) %>% 
+arrange(region_abbr)
+```
+
+Exercise:
+For storms find the average wind per status and make a bar chart of wind per status
+Order the bars from smallest to largest by converting status to a factor
+```{r factors_2, exercise = TRUE}
+storms %>% 
+  arrange(desc(wind)) %>% 
+  mutate(status = factor( , levels = )) %>% 
+  ggplot()+
+  geom_point(aes(x = status, y = wind))
+```
+
+```{r factors_2-solution}
+storms %>% 
+  arrange(desc(wind)) %>% 
+  mutate(status = factor(status, levels = unique(status))) %>% 
+  ggplot()+
+  geom_point(aes(x = status, y = wind))
+```
+
+For penguins find the average body_mass_g per species and make a bar chart of body_mass_g per species
+Order the bars from largest to smallest
+```{r factors_3, exercise = TRUE}
+
+```
+
+```{r factors_3-solution}
+penguins %>% 
+  group_by(species) %>% 
+  summarise(avg_body_mass = mean(body_mass_g, na.rm = T)) %>% 
+  arrange(desc(avg_body_mass)) %>% 
+  mutate(species = factor(species, levels = unique(species))) %>% 
+  ggplot()+
+  geom_col(aes(x = species, y = avg_body_mass))
+```
+
 # Test Your Knowledge
 
 ### Question 1
@@ -2087,3 +2198,7 @@ price_carat <- function(var1, var2){
 diamonds %>% 
   mutate(new_col = price_carat(price, carat))
 ```
+
+
+
+

@@ -78,5 +78,7 @@ learnr
   <br>-Strings
   <br>-Dates & Times
   <br>-Case When
+  <br>-Data Types
+  <br>-Factors
 5.  Program
   <br>-Functions
