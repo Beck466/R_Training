@@ -11,9 +11,6 @@ library(learnr)
 library(tidyverse)
 library(palmerpenguins)
 library(lubridate)
-library(plotly)
-library(DT)
-library(gt)
 ```
 
 ## Visualisation

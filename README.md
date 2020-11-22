@@ -11,9 +11,6 @@ learnr
 <br>tidyverse
 <br>palmerpenguins
 <br>lubridate
-<br>plotly
-<br>DT
-<br>gt
 
 ## Learner Profiles
 ### John the Process Tech
