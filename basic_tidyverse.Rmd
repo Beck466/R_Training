@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(learnr)
 library(tidyverse)
 library(palmerpenguins)
+library(lubridate)
 ```
 
 ## Visualisation
@@ -336,12 +337,12 @@ ggplot(data = ToothGrowth) + #spelling mistake, "+" missing
 ## Coding Basics
 
 R can be used as a calculator
-```{r calculator}
+```{r calculator, warning = FALSE}
 5 * 6
 ```
 
 Values or objects can be stored by assigning them to a name.  Run the object name to call the output of the object
-```{r storing_objects}
+```{r storing_objects, warning = FALSE}
 variable <- 5
 object <- 2 * 5
 
@@ -352,6 +353,15 @@ object
 -Names can include capital letters, numbers, underscores, and full stops.  Do not use special characters or spaces.
 -Snake case is recommended: i_am_snake_case (all lower case with underscores separating words)
 -Make object names descriptive
+
+To see what a dataframe looks like:
+```{r view_dataframe, warning = FALSE}
+str(storms)
+storms
+head(storms, 3)
+glimpse(storms)
+view(storms)
+```
 
 Functions come in the form of function_name(arg1 = val1, arg2 = val2, ...)
 In R, brackets always come in pairs, as well as quotation marks
@@ -410,7 +420,7 @@ premium_diamonds <- filter(diamonds, cut == "Premium", color == "I")
 premium_diamonds
 ```
 
-### Filter - Logical Operators
+#### Filter - Logical Operators
 
 Multiple arguments can be combined used “and”, “or”, and “not”
 “and” = “&”, “or” = “|”, “not” = “!’
@@ -1339,7 +1349,7 @@ BOD[3,2]
 ```
 
 To use this with a pipe use "."
-```{r subset_4, warning = FALSE}
+```{r subset_5, warning = FALSE}
 BOD %>% 
   .$x
 #OR
@@ -1349,11 +1359,11 @@ BOD %>%
 
 Exercise:
 Extract the "carb" column from the "Formaldehyde" dataset
-```{r subset_5, warning = FALSE}
+```{r subset_6, warning = FALSE}
 
 ```
 
-```{r subset_5-solution}
+```{r subset_6-solution}
 Formaldehyde$carb
 #OR
 Formaldehyde %>% 
@@ -1372,11 +1382,11 @@ Formaldehyde %>%
 
 Exercise:
 Extract the 3rd row from the "Formaldehyde" dataset
-```{r subset_6, warning = FALSE}
+```{r subset_7, warning = FALSE}
 
 ```
 
-```{r subset_6-solution}
+```{r subset_7-solution}
 Formaldehyde[3,]
 #OR
 Formaldehyde %>% 
@@ -1385,11 +1395,11 @@ Formaldehyde %>%
 
 Exercise:
 Extract the value from the 3rd row and "optden" column in the "Formaldehyde" dataset
-```{r subset_7, warning = FALSE}
+```{r subset_8, warning = FALSE}
 
 ```
 
-```{r subset_7-solution}
+```{r subset_8-solution}
 Formaldehyde[3,2]
 #OR
 Formaldehyde %>% 
@@ -1401,8 +1411,986 @@ Formaldehyde %>%
   .[3,"optden"]
 ```
 
+### Data Import / Export
+Data can be imported from files from outside of R.  We will look at how to import from csv, xls, or xlsx file.
 
+To import from csv:
+loaded_data <- read_csv("file_path.csv")
 
+To import from xls or xlsx (depending on the file type):
+loaded_data <- read_xls("file_path.xls", sheet = "Sheet 1")
+loaded_data <- read_xlsx("file_path.xlsx", sheet = "Sheet 1")
 
+To write to a csv:
+write_csv(dataset, "file_name.csv")
 
+Data can also be saved as “rds” files, which is a file type that stores a single R object, and retains the formatting or the dataframe.
 
+To create an rds file:
+saveRDS(dataset, "file_name.rds")
+
+To read in a saved rds file:
+loaded_data <- readRDS("file_path.rds")
+
+### Pivoting
+
+#### Pivot Longer
+Sometimes column names are not variables, but the values of a variable.
+When analysing data it is more useful to have one observation of each variable per row.
+pivot_longer() can be used to tidy the data into this format
+
+Before pivoting:
+```{r pivot_longer_1, warning = FALSE}
+storms %>% 
+  select(name, status, wind, pressure)
+```
+
+After pivoting:
+```{r pivot_longer_2, warning = FALSE}
+storms %>% 
+  select(name, status, wind, pressure) %>% 
+  pivot_longer(cols = c(-name, -status),
+               names_to = "variable",
+               values_to = "value")
+```
+
+#### Pivot Wider
+Pivot_wider() is the opposite of pivot_longer()
+It is used when observations are scattered across rows
+
+Before pivoting:
+```{r pivot_wider_1, warning = FALSE}
+storms %>% 
+  group_by(name, status) %>% 
+  summarise(wind = mean(wind, na.rm = T))
+```
+
+After pivoting:
+```{r pivot_wider_2, warning = FALSE}
+storms %>% 
+  group_by(name, status) %>% 
+  summarise(wind = mean(wind, na.rm = T)) %>% 
+  pivot_wider(names_from = status,
+              values_from = wind)
+```
+
+Exercise:
+For "diamonds", calculate the average price for each group of "cut" and "color", then pivot the table to have one column per each "color" showing the average price
+```{r pivot_wider_3, exercise = TRUE}
+diamonds %>% 
+  group_by() %>% 
+  summarise(price = ) %>% 
+  pivot_wider(names_from = ,
+              values_from = )
+```
+
+```{r pivot_wider_3-solution}
+diamonds %>% 
+  group_by(cut, color) %>% 
+  summarise(price = mean(price, na.rm = T)) %>% 
+  pivot_wider(names_from = color,
+              values_from = price)
+```
+
+Exercise:
+Using "penguins", change the table shape to have 1 observation of "bill_length_mm", "bill_depth_mm", "flipper_length_mm", and "body_mass_g" per row.
+```{r pivot_longer_3, exercise = TRUE}
+
+```
+
+```{r pivot_longer_3-solution}
+penguins %>% 
+  pivot_longer(cols = c(-species, -island, -sex, -year),
+               names_to = "variable",
+               values_to = "value")
+```
+
+### Joining
+
+Joining functions can be used to join tables together based on a common values.
+The following datasets which have values in common in the name column:
+```{r joining_datasets, warning = FALSE}
+band_members
+band_instruments
+```
+
+left_join() retains all rows from the first dataset, and joins in the rows from the second dataset where there is a match between the specified columns:
+```{r left_join, warning = FALSE}
+band_members %>% 
+left_join(band_instruments, by = c("name"))
+```
+
+right_join() retains all rows from the second dataset, joining in matching rows from the first dataset:
+```{r right_join, warning = FALSE}
+band_members %>% 
+  right_join(band_instruments, by = c("name"))
+```
+
+full_join() retains all rows from both datasets:
+```{r full_join, warning = FALSE}
+band_members %>% 
+  full_join(band_instruments, by = c("name"))
+```
+
+inner_join() retains only rows which have a common value in both datasets:
+```{r inner_join, warning = FALSE}
+band_instruments %>% 
+  inner_join(band_members, by = c("name"))
+```
+
+anti_join() retains rows which are in one or the other datasets (not both):
+```{r anti_join, warning = FALSE}
+band_instruments %>% 
+  anti_join(band_members, by = c("name"))
+```
+
+Exercise:
+For InsectSprays, join in the table of spray names:
+```{r left_join_1, exercise = TRUE}
+spray_names <- tribble(~spray_factor, ~spray_name,
+        "A",           "Black Flag",
+        "B",           "Raid",
+        "C",           "Mortein",
+        "D",           "Expra",
+        "E",           "Pestrol",
+        "F",           "Ecomist")
+
+InsectSprays %>% 
+  left_join(, by = c( = ))
+```
+
+```{r left_join_1-solution}
+spray_names <- tribble(~spray_factor, ~spray_name,
+        "A",           "Black Flag",
+        "B",           "Raid",
+        "C",           "Mortein",
+        "D",           "Expra",
+        "E",           "Pestrol",
+        "F",           "Ecomist")
+
+InsectSprays %>% 
+  left_join(spray_names, by = c("spray" = "spray_factor"))
+```
+
+Exercise:
+Join the abbr_status table into the storms dataframe to give a new column with the abbreviation.
+```{r left_join_2, exercise = TRUE}
+abbr_status <- tribble(~status,                ~abbr_status,
+                             "tropical depression",  "DEPR",
+                             "tropical storm",       "STRM",
+                             "hurricane",            "HURR")
+```
+
+```{r left_join_2-solution}
+abbr_status <- tribble(~status,                ~abbr_status,
+                             "tropical depression",  "DEPR",
+                             "tropical storm",       "STRM",
+                             "hurricane",            "HURR")
+
+storms %>% 
+  left_join(abbr_status, by = c("status"))
+```
+
+### Strings
+
+There are functions to make interacting with strings easier.
+
+str_detect()
+Detects patterns in a string
+```{r str_detect, warning = FALSE}
+storms %>% 
+  filter(str_detect(status, "dep"))
+```
+
+str_replace() / str_replace_all()
+Replaces a pattern in a string with another pattern.  str_replace_all replaces all instances of the pattern, whereas str_replace only replaces the first instance
+```{r str_replace, warning = FALSE}
+storms %>% 
+  mutate(status = str_replace(status, " ", "_"))
+
+storms %>% 
+  mutate(status = str_replace_all(status, "r", "-"))
+```
+
+substr()
+Extracts characters from a string based on position
+```{r substr, warning = FALSE}
+storms %>% 
+  mutate(status = substr(status, 1, 4))
+```
+
+str_squish()
+Removes extra white space before and after a string, as well as duplicated white space within a string (note: will not remove a single space, only one or more spaces)
+```{r str_squish, warning = FALSE}
+storms %>% 
+  mutate(status = str_squish(status))
+```
+
+tolower() / toupper()
+Converts the string to all lowercase, or all uppercase
+```{r tolower, warning = FALSE}
+storms %>% 
+  mutate(name = tolower(name))
+
+storms %>% 
+  mutate(status = toupper(status))
+```
+
+paste()
+Joins one or more strings together
+```{r paste, warning = FALSE}
+storms %>% 
+  mutate(name = paste(name, "-", year))
+```
+
+Exercise:
+For "diamonds", paste the "color" column into the "cut" column, separated by a "-", convert the new "cut" column to lowercase, and replace any "J's" in "color" with "Z"
+```{r strings_1, exercise = TRUE}
+diamonds %>% 
+  mutate(cut = paste( ),
+         cut = tolower( ),
+         color = str_replace())
+```
+
+```{r strings_1-solution}
+diamonds %>% 
+  mutate(cut = paste(cut, "-", color),
+         cut = tolower(cut),
+         color = str_replace(color, "J", "Z"))
+```
+
+Exercise:
+For "penguins", filter for any islands with an "o", convert "species" to be the first 3 letters of "species" and convert to uppercase
+```{r strings_2, exercise = TRUE}
+
+```
+
+```{r strings_2-solution}
+penguins %>% 
+  filter(str_detect(island, "o")) %>% 
+  mutate(species = substr(species, 1, 3),
+         species = toupper(species))
+```
+
+### Dates and Times
+The lubridate package has helpful functions for dealing with dates and times
+
+Converting a character string to a date:
+```{r dates, warning = FALSE}
+ymd("2020-08-01")
+dmy(01082020)
+mdy("08/01/20")
+```
+
+Converting a character string to a date/time:
+```{r dates_1, warning = FALSE}
+ymd_hm("2020-Aug-01 18:00")
+dmy_hms(01082020180000)
+mdy_h("08/01/20 6pm")
+```
+
+Using as.POSIXct:
+```{r dates_2, warning = FALSE}
+as.POSIXct("2020-Aug-01 18:00", format = "%Y-%b-%d %H:%M")
+```
+
+There can be timezone issues with dates – although the timezone isn’t shown, there is a timezone attached.
+The lubridate (ymd()) functions by default set the timezone to UTC
+If there are date issues, try setting the timezone to “UTC”
+
+Elements of the date/time can be pulled out:
+Extracting month:
+```{r month, warning = FALSE}
+ymd(20200801) %>% 
+  month()
+```
+
+Extracting year:
+```{r year, warning = FALSE}
+ymd(20200801) %>% 
+  year()
+```
+
+To add and subtract dates use the duration functions
+Subtracting a year:
+```{r dates_3, warning = FALSE}
+ymd(20200801) - dyears(1)
+```
+
+Subtracting 2 days:
+```{r dates_4, warning = FALSE}
+ymd(20200801) - ddays(2)
+```
+
+Dates can be rounded
+
+round_date() rounds up or down to the nearest specified time period:
+```{r round_date, warning = FALSE}
+ymd(20200818) %>% 
+  round_date("month")
+```
+
+floor_date() rounds down to the last nearest time period:
+```{r floor_date, warning = FALSE}
+ymd_hms("2020-08-14 12:58:00") %>% 
+  floor_date("hour")
+```
+
+ceiling_date() rounds up to the next time period:
+```{r ceiling_date, warning = FALSE}
+ymd_hms("2020-08-14 12:14:00") %>% 
+  ceiling_date("hour")
+```
+
+Current times
+To get the current Date:
+```{r current_date, warning = FALSE}
+Sys.Date()
+```
+
+To get the current time:
+```{r current_time, warning = FALSE}
+Sys.time()
+```
+
+Example:
+Using the functions with a table:
+```{r dates_5, warning = FALSE}
+table_with_date <- tribble(~date_time,       ~value,
+                           "20200801 12:30", 23,
+                           "20200902 18:45", 34,
+                           "20201003 06:18", 12,
+                           "20201004 22:47", 18)
+
+table_with_date %>% 
+  mutate(date_time = ymd_hm(date_time),
+         month = month(date_time),
+         rounded_date = floor_date(date_time, "day"))
+```
+
+Exercise:
+For "storms", turn the date_time column into a date/time format.  Create a new column of month, create a new column of the same time but for the previous day, and create a new column calculating the time since the event till now.
+```{r dates_6, exercise = TRUE}
+storms %>% 
+  mutate(date_time = paste(day, month, year, hour),
+         date_time =   ,
+         month =   ,
+         previous_day = date_time - ,
+         time_since_event =   - date_time)
+```
+
+```{r dates_6-solution}
+storms %>% 
+  mutate(date_time = paste(day, month, year, hour),
+         date_time = dmy_h(date_time),
+         month = month(date_time),
+         previous_day = date_time - days(1),
+         time_since_event = Sys.time() - date_time)
+```
+
+Exercise:
+For "airquality", assuming the year is 2004, create a date column.  Create a column with the date rounded down to the first of the month.  Find the number of days between the date and the first of the month.
+```{r dates_7, exercise = TRUE}
+
+```
+
+```{r dates_7-solution}
+airquality %>% 
+  mutate(date = paste(Day, Month, "2004"),
+         date = dmy(date),
+         rounded_month = floor_date(date, "month"),
+         date_difference = date - rounded_month)
+```
+
+### Case When
+case_when can be used as a multiple if else statement
+It contains a list of if else conditions and the value to be assigned to the variable if the condition is met
+
+For "storms", change the "month" column to say "June", "July", or "August", or "Not Winter" depending on its value.
+```{r case_when, warning = FALSE}
+storms %>% 
+  mutate(month = case_when(
+    month == 6 ~ "June",
+    month == 7 ~ "July",
+    month == 8 ~ "August",
+    TRUE ~ "Not Winter"
+  ))
+```
+
+The TRUE argument specifies what to do if no conditions are met
+The conditions are evaluated in order
+If there is only one condition then consider using an ifelse() statement instead
+
+For storms, change the month column to be either "June" or "Not June", based on its value.
+```{r ifelse, warning = FALSE}
+storms %>% 
+  mutate(month = ifelse(month == 6, "June", "Not June"))
+```
+
+Exercise:
+For "diamonds", create a new column called "cut_quality", where if cut is "Ideal" or "Premium" then the value is "high", if cut is "Good" or "Very Good" the value is "average", and if cut is "Fair then value is "low"
+```{r case_when_2, exercise = TRUE}
+
+```
+
+```{r case_when_2-solution}
+diamonds %>% 
+  mutate(cut_quality = case_when(cut == "Ideal" | cut == "Premium" ~ "high",
+                                 cut == "Good" | cut == "Very Good" ~ "average",
+                                 cut == "Fair" ~ "low"))
+```
+
+Exercise:
+For "penguins", create a column that indicates if a penguin is small, medium, or large.  If body_mass_g is less than 3500 then it is small, if it is over 5000 then it is large, and everything else if average.
+```{r case_when_3, exercise = TRUE}
+
+```
+
+```{r case_when_3-solution}
+penguins %>% 
+  mutate(size = case_when(body_mass_g < 3500 ~ "small",
+                          body_mass_g >= 5000 ~ "large",
+                          TRUE ~ "average"))
+```
+
+### Data Types
+To change a column from one data type to another:
+```{r data_types, warning = FALSE}
+storms %>% 
+  mutate(month = as.character(month),
+         month = as.numeric(month),
+         name = as.numeric(name))
+```
+
+Exercise:
+Select the 3rd character from the clarity column and convert the column to numeric
+```{r data_types_1, exercise = TRUE}
+diamonds %>% 
+  mutate(clarity = substr(clarity, 3, 3),
+         clarity =   (clarity))
+```
+
+```{r data_types_1-solution}
+diamonds %>% 
+  mutate(clarity = substr(clarity, 3, 3),
+         clarity = as.numeric(clarity))
+```
+
+Exercise:
+In"penguins", convert the year column to be a character
+```{r data_types_2, exercise = TRUE}
+
+```
+
+```{r data_types_2-solution}
+penguins %>% 
+  mutate(year = as.character(year))
+```
+
+### Factors
+Factors are useful to set the order (or "levels") of a variable.
+If a dataframe is arranged it by a column of type character, it will arrange by alphabetical order.  By converting to a factor, the levels of the factor can be manually defined.
+```{r factors, warning = FALSE}
+regions <- tribble(~region_name,          ~region_abbr,
+                   "Upper North",				  "UNI",
+                   "Central North",				"CNI",
+                   "Lower North",			    "LNI", 
+                   "Upper South",         "USI",
+                   "Central South",				"CSI",
+                   "Lower South",				  "LSI")
+
+regions %>% 
+  mutate(region_abbr = factor(region_abbr, levels = c("UNI", "CNI", "LNI", "USI", "CSI", "LSI"))) %>% 
+  arrange(region_abbr)
+```
+
+Factors can also be specified by the order in which they first appear in the dataset
+```{r factors_1, warning = FALSE}
+regions <- tribble(~region_name,          ~region_abbr, ~id, 
+                   "Upper North",				  "UNI", 1,
+                   "Central North",				"CNI", 2,
+                   "Lower North",			    "LNI",4, 
+                   "Upper South",         "USI",3,
+                   "Central South",				"CSI",5,
+                   "Lower South",				  "LSI",6)
+
+regions %>% 
+  arrange(desc(id)) %>% 
+  mutate(region_abbr = factor(region_abbr, levels = unique(region_abbr))) %>% 
+arrange(region_abbr)
+```
+
+Exercise:
+For "storms" find the average "wind" per "status" and make a bar chart of "wind" per "status"
+Order the bars from smallest to largest by converting "status" to a factor
+```{r factors_2, exercise = TRUE}
+storms %>% 
+  arrange(desc(wind)) %>% 
+  mutate(status = factor( , levels = )) %>% 
+  ggplot()+
+  geom_point(aes(x = status, y = wind))
+```
+
+```{r factors_2-solution}
+storms %>% 
+  arrange(desc(wind)) %>% 
+  mutate(status = factor(status, levels = unique(status))) %>% 
+  ggplot()+
+  geom_point(aes(x = status, y = wind))
+```
+
+For "penguins" find the average "body_mass_g" per "species" and make a bar chart of "body_mass_g" per "species"
+Order the bars from largest to smallest
+```{r factors_3, exercise = TRUE}
+
+```
+
+```{r factors_3-solution}
+penguins %>% 
+  group_by(species) %>% 
+  summarise(avg_body_mass = mean(body_mass_g, na.rm = T)) %>% 
+  arrange(desc(avg_body_mass)) %>% 
+  mutate(species = factor(species, levels = unique(species))) %>% 
+  ggplot()+
+  geom_col(aes(x = species, y = avg_body_mass))
+```
+
+# Test Your Knowledge
+
+### Question 1
+```{r wrangle_q1, echo = FALSE}
+question("What is the correct way to join two dataframes?",
+  answer("band_members %>% left_join(band_instruments, by = c(name))", message = "Joining variables must be a character string"),
+  answer("band_members %>% left_join(band_instruments, by = c('name'))", correct = TRUE),
+  answer("band_members %>% left_join(band_instruments, by = c('name' = 'plays'))", message = "Need to specify the columns which have common values to join by"),
+  answer("band_members %>% left_join(band_instruments, by = 'name')", message = "Need to specify the joining columns with a list - 'c()'"))
+```
+
+### Question 2
+```{r wrangle_q2, echo = FALSE}
+question("What is the correct way to filter for a string pattern?",
+  answer("storms %>% filter(str_detect('trop'))", message = "Need to specify which column to search in"),
+  answer("storms %>% filter(str_detect('trop', status))", message = "Need to specify column before the pattern"),
+  answer("storms %>% filter(str_detect(status, 'trop'))", correct = TRUE),
+  answer("storms %>% filter(str_extract(status, 'trop'))", message = "The correct function is str_extract()"))
+```
+
+### Question 3
+```{r wrangle_q3, echo = FALSE}
+question("Which will transform a character string into a date format?",
+  answer("ymd_hms('2020-31-12 14:47')", message = "The function needs to match the character string - correct function is ydm_hm"),
+  answer("ymd_hm('20/Dec/31 14:47')", correct = TRUE),
+  answer("ymdhms('2020-12-31 14:47:00')", message = "The correct function has an '-'"),
+  answer("ymd_hms('2020-12-31 14:47:00')", correct = TRUE))
+```
+
+### Question 4
+
+Correct the code:
+```{r wrangle_q4, exercise = TRUE}
+HairEyeColor %>% 
+  as_tibble() %>% 
+  filter(str_detect("Bl")) %>% 
+  mutate(Sex = substr(1, 1, Sex)) %>% 
+  mutate(hair_eye = paste(Hair, -, Eye)) %>% 
+  select(-Hair, -Eye, -Sex) %>% 
+  group_by(haireye) %>% 
+  summarise(n = sum(n)) %>% 
+  pivot_wider(names_from(hair_eye),
+              values_from(n))
+```
+
+```{r wrangle_q4-solution}
+HairEyeColor %>% 
+  as_tibble() %>% 
+  filter(str_detect(Hair, "Bl")) %>% #need to specify which column
+  mutate(Sex = substr(Sex, 1, 1)) %>% #need to specify column first
+  mutate(hair_eye = paste(Hair, "-", Eye)) %>% #need to use quotations around the "-"
+  select(-Hair, -Eye, -Sex) %>% 
+  group_by(hair_eye) %>% #correct spelling
+  summarise(n = sum(n)) %>% 
+  pivot_wider(names_from = hair_eye, # need to use "="
+              values_from = n) 
+```
+
+### Question 5
+
+For "mtcars", find the average mpg per group of cyl and hp.  Convert hp to a factor, with the levels taken from the dataset in the order they appear when arranged by mpg.  Create a plot of hp vs mpg coloured by cyl.
+```{r wrangle_q5, exercise = TRUE}
+
+```
+
+```{r wrangle_q5-solution}
+mtcars %>% 
+  group_by(cyl, hp) %>% 
+  summarise(mpg = mean(mpg, na.rm = T)) %>% 
+  arrange(mpg) %>% 
+  mutate(hp = factor(hp, levels = unique(hp))) %>% 
+  ggplot()+
+  geom_point(aes(x = hp, y = mpg, colour = cyl))
+```
+
+### Question 6
+
+Using "penguins", join in a table called "nearest_locations" by "island."  Change the "island" column to include the "nearest_shore", separated by a "-".  select the "species", "island", "sex", and "body_mass_g" columns, and group by all except "body_mass_g".  Find the average "body_mass_g" per group, filter for "sex" is not NA, then change the table to have one column of average "body_mass_g" for "male" and one for "female."
+```{r wrangle_q6, exercise = TRUE}
+nearest_locations <- tribble(~island,     ~nearest_shore,
+                             "Biscoe",    "Graham Land",
+                             "Torgersen", "Litchfield Island",
+                             "Dream",     "Cape Monaco")
+```
+
+```{r wrangle_q6-solution}
+nearest_locations <- tribble(~island,     ~nearest_shore,
+                             "Biscoe",    "Graham Land",
+                             "Torgersen", "Litchfield Island",
+                             "Dream",     "Cape Monaco")
+
+penguins %>% 
+  left_join(nearest_locations, by = c("island")) %>% 
+  mutate(island = paste(island, "-", nearest_shore)) %>% 
+  select(species, island, sex, body_mass_g) %>% 
+  group_by(species, island, sex) %>% 
+  summarise_all(mean, na.rm = T) %>% 
+  filter(!is.na(sex)) %>% 
+  pivot_wider(names_from = sex,
+              values_from = body_mass_g)
+```
+
+### Question 7
+
+•	Create a dataframe called descriptions with the following info:
+status	                description
+tropical depression	    Tropical cyclone < 33 knots
+tropical storm	        Tropical cyclone between 34 and 63 knots
+hurricane	              Tropical cyclone > 64 knots
+•	Join the newly created descriptions dataframe into the storms dataframe
+•	In the new storms dataframe, create an additional datetime column using the existing columns in the dataframe
+•	Select the name, description, date_time, and wind columns only
+•	Group by name and description and find the average wind speed for each group
+•	Create a column to assign a new_status based on wind. If wind is less than 33 call it “tropical depression”, if wind is above 63 knots then call it “hurricane”, and anything in between call “tropical storm”.
+•	Find the distinct values for the name, new_status, and average wind columns only
+•	Use pivot_wider to make each new_status it’s own column with average wind speed as the values
+•	Change the name “Belle” to “Bella”
+•	Filter for only names with a “z” in them
+```{r wrangle_q7, exercise = TRUE}
+
+```
+
+```{r wrangle_q7-solution}
+descriptions <- tribble(~status, ~description,
+"tropical depression", "Tropical cyclone < 33 knots",
+"tropical storm", "Tropical cyclone between 34 and 63 knots",
+"hurricane", "Tropical cyclone > 64 knots")
+
+storms %>% 
+left_join(descriptions, by = c("status" = "status")) %>%
+mutate(datetime = make_datetime(year, month, day, hour)) %>%
+select(name, description, datetime, wind) %>%
+group_by(name, description) %>%
+summarise(avg_wind = mean(wind, na.rm = T)) %>%
+mutate(status = case_when(avg_wind < 33 ~ "tropical depression",
+avg_wind > 63 ~ "hurricane",
+avg_wind >= 33 & avg_wind <= 63 ~ "tropical storm")) %>% 
+  distinct(name, status, avg_wind) %>% 
+  pivot_wider(names_from = status,
+              values_from = avg_wind) %>% 
+  mutate(name = str_replace(name, "Belle", "Bella")) %>% 
+  filter(str_detect(name, "z"))
+```
+
+## Program
+
+### Functions
+Functions allow code to be automated and reproducible.
+If code is repeated, functions allow the code to be stored in a function and applied by calling the function.
+If the code needs to be changed, it then only needs to be changed in one place.
+
+Create a function to multiply one variable by another
+```{r functions, warning = FALSE}
+multiplication <- function(input1, input2){
+  input1 * input2
+}
+
+x = 4
+y = 6
+
+multiplication(input1 = x, input2 = y)
+```
+
+Use the function above to create a new column in storms of wind x pressure
+```{r functions_2, warning = FALSE}
+storms %>% 
+  mutate(wind_pressure = multiplication(wind, pressure))
+```
+
+Adding more complication to the function
+```{r functions_3, warning = FALSE}
+multiplication <- function(input1, input2){
+  x = input1 /300
+  y = input2 * input1
+  
+  x*y
+}
+
+storms %>% 
+  mutate(wind_pressure = multiplication(wind, pressure))
+```
+
+Can also use if else statements within a function to change which calculation to use:
+```{r functions_4, warning = FALSE}
+multiplication <- function(input1, input2, input3){
+  if(input1 <100){
+  x = input1 /300
+  y = input2 *100
+  } else if(input1 > 300) {
+    x = input1
+  y = input2 *100
+  } else {
+    x = input1
+  y = input2
+  }
+  
+  x*y
+}
+
+storms %>% 
+  mutate(wind_pressure = multiplication(wind, pressure, status))
+```
+
+A function can also be used to perform a calculation on an entire dataframe
+```{r functions_5, warning = FALSE}
+storms_engineering <- function(df){
+  df %>% 
+  select(name, status, wind) %>% 
+  filter(status == "hurricane")
+}
+
+storms_engineering(storms)
+```
+
+Exercise:
+Create a function to divide column_a by 100, multiply column_b by 100, then return the first variable multiplied by the second variable.  Apply this to diamonds using price and carat as the inputs.
+```{r functions_6, exercise = TRUE}
+price_carat <- function( ){
+  x = 
+  y = 
+  
+  
+}
+
+diamonds %>% 
+  mutate(new_col = price_carat(  ))
+```
+
+```{r functions_6-solution}
+price_carat <- function(var1, var2){
+  x = var1 / 100
+  y = var2 * 100
+  
+  x*y
+}
+
+diamonds %>% 
+  mutate(new_col = price_carat(price, carat))
+```
+
+Exercise:
+Modify the function above to only divide "column_a" if it is over 1000.  "column_b" should still be multiplied by 100
+```{r functions_7, exercise = TRUE}
+
+```
+
+```{r functions_7-solution}
+price_carat <- function(var1, var2){
+  if(var1 > 1000){
+  x = var1 / 100
+  } else {
+  x = var1
+  }
+  y = var2 * 100
+  
+  x*y
+}
+
+diamonds %>% 
+  mutate(new_col = price_carat(price, carat))
+```
+
+### Mapping
+The map function can be used to apply a function to multiple inputs.  Map will loop over a vector and apply the function to each element.
+Each function takes a vector as input, applies a function to each piece, and then returns a new vector that’s the same length (and has the same names) as the input.
+
+Applying a function to a dataframe using map
+```{r map, warning = FALSE}
+price_carat <- function(var1){
+  x = var1 / 100
+  x
+}
+
+diamonds %>% 
+  mutate(new_col = map(price, price_carat)) %>% 
+  unnest(new_col)
+```
+
+If the function has other arguments to manually specify, add these after the function name
+```{r map_2, warning = FALSE}
+price_carat <- function(var1, var2){
+  x = var1 / 100
+  x
+}
+
+diamonds %>% 
+  mutate(new_col = map(price, price_carat,
+                       var2 = 5)) %>% 
+  unnest(new_col)
+```
+
+If the function requires more than one input from the dataframe, then map2 can be applied
+```{r map2, warning = FALSE}
+price_carat <- function(var1, var2){
+  x = var1 / 100
+  y = var2 * 100
+  
+  x*y
+}
+
+diamonds %>% 
+  mutate(new_col = map2(price, carat, price_carat)) %>% 
+  unnest(new_col)
+```
+For more than two inputs coming from the dataframe, the pmap function should be used.
+
+Exercise:
+Use map2 to apply the multiplication function to storms, using wind and pressure as the inputs:
+```{r map2_2, exercise = TRUE}
+multiplication <- function(input1, input2){
+  x = input1 /300
+  y = input2 * input1
+  
+  x*y
+}
+
+storms %>% 
+  mutate(wind_pressure =   (  ,  ,  )) %>% 
+  unnest()
+```
+
+```{r map2_2-solution}
+multiplication <- function(input1, input2){
+  x = input1 /300
+  y = input2 * input1
+  
+  x*y
+}
+
+storms %>% 
+  mutate(wind_pressure = map2(wind, pressure, multiplication)) %>% 
+  unnest(wind_pressure)
+```
+
+Exercise:
+Use map to apply the convert_length function to the "bill_length_mm", "bill_depth_mm", and "flipper_length_mm" columns of the "penguins" dataset
+```{r}
+convert_length <- function(length){
+  length / 1000
+}
+
+```
+
+```{r}
+convert_length <- function(length){
+  length / 1000
+}
+
+penguins %>% 
+  mutate(bill_length_mm = map(bill_length_mm, convert_length),
+         bill_depth_mm = map(bill_depth_mm, convert_length),
+         flipper_length_mm = map(bill_length_mm, convert_length)) %>% 
+  unnest(c(bill_length_mm, bill_depth_mm, flipper_length_mm))
+```
+
+# Test Your Knowledge
+
+### Question 1
+```{r program_q1, echo = FALSE}
+question("What is the correct way to create a function?",
+  answer("new_function = function(input1, input2) = input1 * input2", message = "Use '{ }' to designate what the function does)"),
+  answer("new_function = function(input1, input2) {input_1 * input_2}", message = "inputs used in function need to match the inputs to the function"),
+  answer("new_function = function(input1, input2) {input1 * input2}", correct = TRUE),
+  answer("new_function = c(input1, input2) {input1 * input2}", message = "To create a function need to specify that it is a function"))
+```
+
+### Question 2
+```{r program_q2, echo = FALSE}
+question("How should map be used?",
+  answer("df %>% mutate(new_column = map(function, column_a))", message = "The input should be specified before the function"),
+  answer("df %>% mutate(new_column = map(column_a, function))", correct = TRUE),
+  answer("df %>% mutate(new_column = map2(column_a, function, input_2 = 2))", message = "map2 is only used if there are 2 columns being mapped into the function"),
+  answer("df %>% mutate(new_column = map(column_a, function, input_2 = 2))", correct = TRUE))
+```
+
+### Question 3
+Correct the code
+```{r program_q3, exercise = TRUE}
+calc_dosage <- function(conc, delivery)(
+  conc * dosage
+)
+
+CO2 %>% 
+  as_tibble() %>% 
+  mutate(dosage = map(conc, delivery, calc_dosage())) %>% 
+  unnest(dosage)
+```
+
+```{r program_q3-solution}
+calc_dosage <- function(conc, delivery){   # need to use "{ }" to specify the function
+  conc * delivery                          #variable names need to match the input names
+}
+
+CO2 %>% 
+  as_tibble() %>% 
+  mutate(dosage = map2(conc, uptake, calc_dosage)) %>%  #correct function is map, inputs need to match column names, just the function name is used
+  unnest(dosage)
+```
+
+### Question 4
+Create a function called "calculate_dosage" which takes in "dosage" and "supplement" as inputs.  If "supplement" is equal to "VC" then multiply "dosage" by 2, or if "supplement" is equal to "OJ" then leave "dosage" the same.  Map the function over the "ToothGrowth" dataset selecting the relevant columns as inputs, creating a new column called "calc_dosage".
+```{r program_q4, exercise = TRUE}
+
+```
+
+```{r program_q4-solution}
+calculate_dosage <- function(dosage, supplement){
+  if(supplement == "VC"){
+    calc_dose <- dosage * 2
+  } else if(supplement == "OJ"){
+    calc_dose <- dosage
+  }
+  
+  calc_dose
+  }
+
+ToothGrowth %>% 
+  mutate(calc_dosage = map2(dose, supp, calculate_dosage)) %>% 
+  unnest(calc_dosage)
+```
+
+### Question 5
+Using the starwars dataset, filter out NA’s from the "birth_year" and "hair_color" columns.  Change the "birth_year" column type from numeric to character, and separate the "hair_color" column into one colour per row (hint: use the separate_rows function).  Create a function to multiply "height" by "mass" and then use map to apply it to the dataset to create a new column.
+```{r program_q5, exercise = TRUE}
+
+```
+
+```{r program_q5-solution}
+height_mass <- function(input1, input2){
+  input1 * input2
+}
+
+starwars %>% 
+  filter(!is.na(birth_year),
+         !is.na(hair_color)) %>% 
+  mutate(birth_year = as.character(birth_year)) %>% 
+  separate_rows(hair_color) %>% 
+  mutate(height_mass = height_mass(height, mass))
+```

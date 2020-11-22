@@ -10,6 +10,7 @@ This training was developed to reinforce the learning of R, in conjunction with 
 learnr
 <br>tidyverse
 <br>palmerpenguins
+<br>lubridate
 
 ## Learner Profiles
 ### John the Process Tech
@@ -71,3 +72,14 @@ learnr
   <br>-Summarising
 4.  Data Wrangle
   <br>-Tibbles
+  <br>-Data Import/Export
+  <br>-Pivoting
+  <br>-Joining
+  <br>-Strings
+  <br>-Dates & Times
+  <br>-Case When
+  <br>-Data Types
+  <br>-Factors
+5.  Program
+  <br>-Functions
+  <br>-Mapping
