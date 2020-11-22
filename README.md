@@ -86,5 +86,3 @@ learnr
 5.  Program
   <br>-Functions
   <br>-Mapping
-6.  Presentation
-  <br>-Plotly
